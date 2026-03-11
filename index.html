@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบเบิกน้ำดื่มและเครื่องดื่ม</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* โทนสีฟ้าพรีเมียม สื่อถึงน้ำและความสะอาด */
+            --primary-color: #2563eb; 
+            --primary-hover: #1d4ed8;
+            --bg-color: #f0f9ff;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --danger-color: #ef4444;
+            --edit-color: #f59e0b;
+        }
+        body { font-family: 'Prompt', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .app-container { width: 100%; max-width: 600px; background: var(--card-bg); border-radius: 16px; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.1); overflow: hidden; position: relative; }
+        .header { background-color: var(--primary-color); color: white; padding: 25px 20px; text-align: center; }
+        .header h1 { margin: 0; font-size: 24px; font-weight: 600; }
+        .header p { margin: 5px 0 0; font-size: 14px; opacity: 0.9; }
+        .content { padding: 30px 25px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; }
+        input[type="text"], input[type="password"], input[type="number"], select, textarea { width: 100%; padding: 12px 15px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; font-family: 'Prompt', sans-serif; font-size: 14px; transition: all 0.3s; }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+        
+        .item-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
+        .item-card { display: flex; align-items: center; border: 1px solid var(--border-color); padding: 12px; border-radius: 10px; background: #fafafa; transition: border-color 0.3s; }
+        .item-card:hover { border-color: var(--primary-color); }
+        .item-card img { width: 55px; height: 55px; object-fit: cover; border-radius: 8px; margin-right: 15px; border: 1px solid #eee; background: white; }
+        .item-info { flex-grow: 1; }
+        .item-name { font-weight: 500; font-size: 15px; }
+        .item-stock { font-size: 13px; color: var(--text-muted); }
+        .item-qty { width: 85px !important; text-align: center; font-weight: 500;}
+        
+        .btn { width: 100%; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.3s; font-family: 'Prompt', sans-serif; }
+        .btn-submit { background-color: var(--primary-color); }
+        .btn-submit:hover { background-color: var(--primary-hover); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+        .btn-submit:disabled { background-color: #94a3b8; cursor: not-allowed; box-shadow: none; }
+        
+        .admin-footer { text-align: center; padding: 15px; border-top: 1px solid var(--border-color); background: #f8fafc; }
+        .admin-link { color: var(--text-muted); font-size: 13px; text-decoration: none; cursor: pointer; transition: color 0.3s; }
+        .admin-link:hover { color: var(--primary-color); font-weight: 500; }
+        
+        #admin-login-view, #admin-dashboard-view { display: none; }
+        .loading-text { text-align: center; padding: 20px; color: var(--primary-color); font-size: 14px; font-weight: 500;}
+
+        /* สไตล์สำหรับหน้าแอดมิน */
+        .admin-box { background: #f1f5f9; border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; margin-bottom: 25px; }
+        .admin-list-item { display: flex; flex-direction: column; padding: 15px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 10px; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .admin-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .action-btns { display: flex; gap: 8px; }
+        .btn-small { padding: 6px 12px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; color: white; font-family: 'Prompt'; font-weight: 500;}
+        .btn-edit { background-color: var(--edit-color); }
+        .btn-delete { background-color: var(--danger-color); }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <div id="user-view">
+            <div class="header">
+                <h1>💧 ระบบเบิกน้ำดื่มบริษัท</h1>
+                <p>กรุณากรอกข้อมูลเพื่อดำเนินการเบิกน้ำดื่มและเครื่องดื่ม</p>
+            </div>
+            
+            <div class="content">
+                <form id="waterForm" onsubmit="submitForm(event)">
+                    <div class="form-group">
+                        <label>ชื่อ-นามสกุลผู้เบิก *</label>
+                        <input type="text" id="fullName" required placeholder="ระบุชื่อ-นามสกุล">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>สังกัด / แผนก *</label>
+                        <select id="department" required onchange="checkDepartment()">
+                            <option value="">-- กรุณาเลือกแผนก --</option>
+                            <option value="แม่บ้าน">แม่บ้าน</option>
+                            <option value="ฝ่ายทรัพยากรบุคคล (HR)">ฝ่ายทรัพยากรบุคคล (HR)</option>
+                            <option value="ฝ่ายบัญชีและการเงิน">ฝ่ายบัญชีและการเงิน</option>
+                            <option value="ฝ่ายขาย / Sales">ฝ่ายขาย / Sales</option>
+                            <option value="อื่นๆ">แผนกอื่นๆระบุ:</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" id="otherDeptDiv" style="display: none;">
+                        <label>ระบุแผนกของคุณ *</label>
+                        <input type="text" id="otherDepartment" placeholder="พิมพ์ชื่อแผนก">
+                    </div>
+
+                    <div class="form-group">
+                        <label>วัตถุประสงค์ / หมายเหตุ *</label>
+                        <textarea id="purpose" rows="2" required placeholder="เช่น ใช้รับรองลูกค้า, ประชุมแผนก, ลงพื้นที่"></textarea>
+                    </div>
+
+                    <label style="margin-top: 25px;">รายการที่ต้องการเบิก (ใส่จำนวน)</label>
+                    <div class="item-list" id="itemListContainer">
+                        <div class="loading-text">⏳ กำลังโหลดรายการน้ำดื่มจากคลัง...</div>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="btn btn-submit">ยืนยันการเบิก</button>
+                </form>
+            </div>
+            <div class="admin-footer">
+                <a class="admin-link" onclick="switchView('admin-login-view')">⚙️ สำหรับผู้ดูแลระบบ (Admin)</a>
+            </div>
+        </div>
+
+        <div id="admin-login-view">
+            <div class="header" style="background-color: #0f172a;">
+                <h1>Admin Login</h1>
+                <p>ระบบจัดการคลังน้ำดื่ม</p>
+            </div>
+            <div class="content">
+                <div class="form-group">
+                    <label>รหัสผ่าน</label>
+                    <input type="password" id="adminPass" placeholder="กรอกรหัสผ่านแล้วกด Enter" onkeypress="if(event.key === 'Enter') loginAdmin()">
+                </div>
+                <button onclick="loginAdmin()" class="btn btn-submit" style="background-color: #0f172a;">เข้าสู่ระบบ</button>
+                <div style="text-align: center; margin-top: 25px;">
+                    <a class="admin-link" onclick="switchView('user-view')">← กลับไปหน้าเบิกน้ำดื่ม</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="admin-dashboard-view">
+            <div class="header" style="background-color: #0f172a;">
+                <h1>จัดการสต๊อกน้ำดื่ม</h1>
+                <p>เพิ่ม / ลบ / อัปเดตสต๊อก</p>
+            </div>
+            <div class="content">
+                
+                <div class="admin-box">
+                    <h3 style="margin-top:0; font-size: 16px; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;" id="adminFormTitle">➕ เพิ่มรายการใหม่</h3>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>รหัส (เช่น W01)</label>
+                            <input type="text" id="itemId" placeholder="ห้ามซ้ำ">
+                        </div>
+                        <div class="form-group">
+                            <label>ชื่อรายการ</label>
+                            <input type="text" id="itemName" placeholder="เช่น น้ำดื่ม 600ml">
+                        </div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>หน่วยนับ</label>
+                            <input type="text" id="itemUnit" placeholder="เช่น ขวด, ลัง">
+                        </div>
+                        <div class="form-group">
+                            <label>จำนวนสต๊อก</label>
+                            <input type="number" id="itemStock" min="0">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>URL รูปภาพ (ถ้ามี)</label>
+                        <input type="text" id="itemImage" placeholder="https://...">
+                    </div>
+                    <div class="action-btns" style="margin-top: 20px;">
+                        <button onclick="saveItemAdmin()" id="btnSaveAdmin" class="btn btn-submit" style="background-color: #059669;">💾 บันทึกข้อมูล</button>
+                        <button onclick="clearAdminForm()" class="btn" style="background-color: #94a3b8; width: 40%;">ล้างค่า</button>
+                    </div>
+                </div>
+
+                <h3 style="font-size: 16px; display: flex; justify-content: space-between; align-items: center;">
+                    📦 รายการในคลัง
+                    <span id="stockCount" style="font-size: 12px; color: #64748b; font-weight: normal;"></span>
+                </h3>
+                <div id="adminStockContainer">
+                    <div class="loading-text">⏳ กำลังโหลดสต๊อก...</div>
+                </div>
+
+                <button onclick="switchView('user-view')" class="btn" style="background-color: #ef4444; margin-top: 30px;">🚪 ออกจากระบบ</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ⚠️ วาง URL Web App ของคุณที่นี่ครับ
+        const API_URL = "https://script.google.com/macros/s/AKfycbxHlw3dFpnuw221inL-9tffcQnzyknQXGdbWfLwnkm2NpywSVzIL0yaM6dmyUCz4Kj7/exec"; 
+        
+        let availableItems = []; 
+
+        window.onload = function() { fetchItems(); };
+
+        function fetchItems() {
+            fetch(API_URL)
+                .then(response => response.json())
+                .then(data => {
+                    availableItems = data;
+                    renderItems(data);
+                    renderAdminStock(data);
+                })
+                .catch(error => console.error("Error fetching items:", error));
+        }
+
+        // --- ส่วนของพนักงาน ---
+        function renderItems(items) {
+            const container = document.getElementById("itemListContainer");
+            container.innerHTML = ""; 
+            if (items.length === 0) { container.innerHTML = '<div class="loading-text">ไม่มีรายการในคลัง</div>'; return; }
+
+            items.forEach((item) => {
+                const imgUrl = item.image ? item.image : `https://via.placeholder.com/100/e0f2fe/0284c7?text=${item.name}`;
+                const isOutOfStock = item.stock <= 0;
+                container.innerHTML += `
+                    <div class="item-card" style="${isOutOfStock ? 'opacity: 0.5; background: #f8fafc;' : ''}">
+                        <img src="${imgUrl}" alt="${item.name}">
+                        <div class="item-info">
+                            <div class="item-name">${item.name}</div>
+                            <div class="item-stock" style="${isOutOfStock ? 'color: #ef4444;' : 'color: #059669;'}">
+                                ${isOutOfStock ? 'สินค้าหมด' : 'พร้อมเบิก: ' + item.stock + ' ' + item.unit}
+                            </div>
+                        </div>
+                        <input type="number" class="item-qty app-input" data-name="${item.name}" data-unit="${item.unit}" min="0" max="${item.stock}" placeholder="จำนวน" ${isOutOfStock ? 'disabled' : ''}>
+                    </div>
+                `;
+            });
+        }
+
+        function submitForm(event) {
+            event.preventDefault(); 
+            const submitBtn = document.getElementById("submitBtn");
+            const inputs = document.querySelectorAll('.app-input');
+            let itemsDataArray = [], itemsSummaryText = [];
+
+            inputs.forEach(input => {
+                let qty = parseInt(input.value);
+                if (qty > 0) {
+                    let name = input.getAttribute('data-name');
+                    let unit = input.getAttribute('data-unit');
+                    itemsDataArray.push({ name: name, qty: qty });
+                    itemsSummaryText.push(`- ${name} จำนวน ${qty} ${unit}`);
+                }
+            });
+
+            if (itemsDataArray.length === 0) return alert("กรุณาระบุจำนวนที่ต้องการเบิกครับ");
+
+            const payload = {
+                action: "request_items", 
+                fullName: document.getElementById("fullName").value,
+                department: document.getElementById("department").value,
+                otherDepartment: document.getElementById("otherDepartment").value,
+                purpose: document.getElementById("purpose").value,
+                itemsDataArray: itemsDataArray,
+                itemsSummary: itemsSummaryText.join("\n")
+            };
+
+            submitBtn.innerText = "⏳ กำลังดำเนินการ...";
+            submitBtn.disabled = true;
+
+            fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    alert("✅ บันทึกการเบิกสำเร็จเรียบร้อยแล้ว!");
+                    document.getElementById("waterForm").reset(); 
+                    checkDepartment(); fetchItems(); 
+                }
+            })
+            .finally(() => { submitBtn.innerText = "ยืนยันการเบิก"; submitBtn.disabled = false; });
+        }
+
+        // --- ส่วนของแอดมิน ---
+        function renderAdminStock(items) {
+            const container = document.getElementById("adminStockContainer");
+            document.getElementById("stockCount").innerText = `(${items.length} รายการ)`;
+            container.innerHTML = "";
+            items.forEach(item => {
+                const itemJson = JSON.stringify(item).replace(/'/g, "&#39;");
+                container.innerHTML += `
+                <div class="admin-list-item">
+                    <div class="admin-item-header">
+                        <div style="font-weight: 500; color: #0f172a;">[${item.id}] ${item.name}</div>
+                        <div class="action-btns">
+                            <button onclick='editItem(${itemJson})' class="btn-small btn-edit">✏️ แก้ไข</button>
+                            <button onclick="deleteItem('${item.id}', '${item.name}')" class="btn-small btn-delete">🗑️ ลบ</button>
+                        </div>
+                    </div>
+                    <div style="font-size: 13px; color: #64748b; display: flex; justify-content: space-between;">
+                        <span>หน่วย: ${item.unit}</span>
+                        <span>คงเหลือ: <strong style="color:${item.stock <= 10 ? '#ef4444' : '#059669'}; font-size: 15px;">${item.stock}</strong></span>
+                    </div>
+                </div>`;
+            });
+        }
+
+        function editItem(item) {
+            document.getElementById("adminFormTitle").innerText = "✏️ แก้ไขข้อมูล";
+            document.getElementById("itemId").value = item.id;
+            document.getElementById("itemId").readOnly = true; 
+            document.getElementById("itemName").value = item.name;
+            document.getElementById("itemUnit").value = item.unit;
+            document.getElementById("itemStock").value = item.stock;
+            document.getElementById("itemImage").value = item.image;
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        }
+
+        function clearAdminForm() {
+            document.getElementById("adminFormTitle").innerText = "➕ เพิ่มรายการใหม่";
+            document.getElementById("itemId").value = "";
+            document.getElementById("itemId").readOnly = false;
+            document.getElementById("itemName").value = "";
+            document.getElementById("itemUnit").value = "";
+            document.getElementById("itemStock").value = "";
+            document.getElementById("itemImage").value = "";
+        }
+
+        function saveItemAdmin() {
+            const id = document.getElementById("itemId").value;
+            const name = document.getElementById("itemName").value;
+            if(!id || !name) return alert("กรุณากรอกรหัสและชื่อรายการครับ");
+
+            const payload = {
+                action: "save_item",
+                item: {
+                    id: id,
+                    name: name,
+                    unit: document.getElementById("itemUnit").value || "ชิ้น",
+                    stock: document.getElementById("itemStock").value || 0,
+                    image: document.getElementById("itemImage").value || ""
+                }
+            };
+
+            const btn = document.getElementById("btnSaveAdmin");
+            btn.innerText = "⏳ กำลังบันทึก..."; btn.disabled = true;
+
+            fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "success") {
+                    alert("✅ " + data.message);
+                    clearAdminForm();
+                    fetchItems(); 
+                }
+            })
+            .finally(() => { btn.innerText = "💾 บันทึกข้อมูล"; btn.disabled = false; });
+        }
+
+        function deleteItem(itemId, itemName) {
+            if(!confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบ "${itemName}" ออกจากสต๊อก?`)) return;
+
+            const payload = { action: "delete_item", itemId: itemId };
+
+            fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "success") {
+                    alert("🗑️ " + data.message);
+                    fetchItems(); 
+                }
+            });
+        }
+
+        function checkDepartment() {
+            const select = document.getElementById("department");
+            const otherDiv = document.getElementById("otherDeptDiv");
+            const otherInput = document.getElementById("otherDepartment");
+            if (select.value === "อื่นๆ") { otherDiv.style.display = "block"; otherInput.required = true; } 
+            else { otherDiv.style.display = "none"; otherInput.required = false; otherInput.value = ""; }
+        }
+
+        function switchView(viewId) {
+            document.getElementById("user-view").style.display = "none";
+            document.getElementById("admin-login-view").style.display = "none";
+            document.getElementById("admin-dashboard-view").style.display = "none";
+            document.getElementById(viewId).style.display = "block";
+            if (viewId === 'admin-dashboard-view') fetchItems();
+        }
+
+        function loginAdmin() {
+            const pass = document.getElementById("adminPass").value;
+            if (pass === "adminhr0208") {
+                document.getElementById("adminPass").value = ""; 
+                switchView("admin-dashboard-view");
+            } else {
+                alert("รหัสผ่านไม่ถูกต้อง");
+            }
+        }
+    </script>
+</body>
+</html>
