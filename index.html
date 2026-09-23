@@ -493,7 +493,11 @@
 
     function renderProducts() {
         const grid = document.getElementById('productGrid');
-        let items = currentFilter === 'all' ? globalItems : globalItems.filter(i => i.name.includes(currentFilter));
+        
+        // อัปเกรดให้ค้นหาคำทั้งจาก "ชื่อรายการ" (name) และ "หน่วยนับ" (unit)
+        let items = currentFilter === 'all' 
+            ? globalItems 
+            : globalItems.filter(i => i.name.includes(currentFilter) || i.unit.includes(currentFilter));
         if (!items.length) { grid.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted); border:1px dashed var(--onyx-border); border-radius:12px;">ไม่พบรายการน้ำดื่มในหมวดหมู่นี้</div>`; return; }
 
         grid.innerHTML = items.map(item => {
