@@ -327,7 +327,8 @@
                 <div class="success-screen" id="successScreen">
                     <div class="success-icon">✓</div>
                     <h2>SUCCESSFUL</h2>
-                    <p style="color: var(--text-muted); margin-bottom:30px;">รายการเบิกน้ำดื่มของคุณถูกบันทึกเรียบร้อยแล้ว<br>ขอบคุณครับ</p>
+                    <p style="color: var(--cream-muted); margin-bottom:10px;">เบิกน้ำดื่มสำเร็จ รายการของคุณถูกบันทึกเรียบร้อยแล้ว<br>ขอบคุณครับ</p>
+                    <p id="successOrderId" style="color: var(--brand-gold); font-weight:700; letter-spacing:1px; margin-bottom:30px;"></p>
                     <button class="btn btn-ghost" onclick="resetForm()">ทำรายการใหม่</button>
                 </div>
             </div>
@@ -543,32 +544,96 @@
         list.innerHTML = items.map(i => `<div class="cart-row"><span>${i.name}</span><strong style="color:var(--brand-gold);">${i.qty} ${i.unit}</strong></div>`).join('');
     }
 
-    document.getElementById('requestForm').addEventListener('submit', function(e) {
+    // ════════ ส่งคำขอเบิก (แก้ปัญหา: ไม่ขึ้นหน้าสำเร็จ + กดซ้ำแล้วยอดเบิกเพิ่ม) ════════
+    let isSubmitting = false;   // ล็อกกันกดซ้ำ
+    let hasSubmitted = false;   // ส่งสำเร็จแล้ว ห้ามส่งซ้ำจนกว่าจะกด "ทำรายการใหม่"
+
+    function setSubmitState(state) {
+        const btn = document.getElementById('submitBtn');
+        const backBtn = document.querySelector('#step-3 .btn-ghost');
+        if (state === 'loading') {
+            btn.disabled = true; btn.innerText = "⏳ กำลังบันทึกข้อมูล... กรุณารอสักครู่";
+            if (backBtn) backBtn.disabled = true;
+        } else {
+            btn.disabled = false; btn.innerText = "ยืนยันการเบิกน้ำดื่ม";
+            if (backBtn) backBtn.disabled = false;
+        }
+    }
+
+    function showSuccessScreen(orderId) {
+        hasSubmitted = true;
+        document.getElementById('wizardSteps').style.display = 'none';
+        document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+        document.getElementById('successOrderId').innerText = orderId ? ('เลขที่บิล: ' + orderId) : '';
+        document.getElementById('successScreen').classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        showToast('✅ เบิกน้ำดื่มสำเร็จ บันทึกเรียบร้อยแล้ว');
+        fetchItems();
+    }
+
+    // ตรวจจากประวัติว่าบิลนี้ถูกบันทึกไปแล้วหรือยัง (กรณีระบบบันทึกได้ แต่ส่งผลตอบกลับมาไม่ถึงหน้าเว็บ)
+    function checkSavedInHistory(fullName, sinceMs) {
+        return fetch(API_URL).then(r => r.json()).then(data => {
+            globalItems = data.items || globalItems; globalHistory = data.history || globalHistory;
+            const found = (data.history || []).find(r =>
+                String(r.name || '').trim() === fullName.trim() &&
+                new Date(r.timestamp).getTime() >= sinceMs - 60000
+            );
+            return found || null;
+        }).catch(() => null);
+    }
+
+    document.getElementById('requestForm').addEventListener('submit', async function(e) {
         e.preventDefault();
+        // กันการส่งจากการกด Enter ในขั้นตอนอื่น / กันกดซ้ำ / กันส่งซ้ำหลังสำเร็จ
+        if (currentStep !== 3 || isSubmitting || hasSubmitted) return;
+
         let itemsDataArray = [];
         document.querySelectorAll('.app-input').forEach(inp => {
             let qty = parseInt(inp.value)||0; if(qty>0) itemsDataArray.push({name:inp.dataset.name, qty});
         });
-        let btn = document.getElementById('submitBtn'); btn.disabled = true; btn.innerText = "กำลังบันทึกข้อมูล...";
-        
+        if (!itemsDataArray.length) { showToast('⚠️ กรุณาเลือกรายการน้ำดื่มอย่างน้อย 1 รายการ', 'error'); return; }
+
+        isSubmitting = true;
+        setSubmitState('loading');
+        const startedAt = Date.now();
+        const fullName = document.getElementById('fullName').value;
+
         const payload = {
             action: "request_items",
-            fullName: document.getElementById('fullName').value,
+            fullName,
             department: document.getElementById('department').value,
             otherDepartment: document.getElementById('otherDepartment').value,
-            purpose: document.getElementById('purpose').value, // ส่งวัตถุประสงค์
+            purpose: document.getElementById('purpose').value,
             itemsDataArray
         };
 
-        fetch(API_URL, { method: "POST", headers: {"Content-Type":"text/plain"}, body: JSON.stringify(payload) })
-        .then(r => r.json()).then(data => {
-            if(data.status==="success") {
-                document.getElementById('wizardSteps').style.display='none';
-                document.querySelectorAll('.form-section').forEach(s=>s.classList.remove('active'));
-                document.getElementById('successScreen').classList.add('active');
-                fetchItems();
+        try {
+            const res = await fetch(API_URL, { method: "POST", headers: {"Content-Type":"text/plain;charset=utf-8"}, body: JSON.stringify(payload) });
+            const text = await res.text();
+            let data = null;
+            try { data = JSON.parse(text); } catch (_) { /* ตอบกลับไม่ใช่ JSON */ }
+
+            const status = data && String(data.status || '').toLowerCase();
+            if (status === 'success' || status === 'ok') {
+                showSuccessScreen(data.orderId || data.id || '');
+                return;
             }
-        }).finally(()=>{ btn.disabled=false; btn.innerText="ยืนยันการเบิกน้ำดื่ม"; });
+            if (data && status === 'error') {
+                // ระบบปฏิเสธจริง (เช่น สต๊อกไม่พอ) → ให้แก้ไขแล้วส่งใหม่ได้
+                showToast('❌ ' + (data.message || 'เบิกไม่สำเร็จ กรุณาลองใหม่'), 'error');
+                isSubmitting = false; setSubmitState('idle');
+                fetchItems();
+                return;
+            }
+            // ตอบกลับมาแต่อ่านสถานะไม่ได้ → เช็คในประวัติก่อน ห้ามเปิดให้กดซ้ำทันที
+            throw new Error('unknown-response');
+        } catch (err) {
+            const saved = await checkSavedInHistory(fullName, startedAt);
+            if (saved) { showSuccessScreen(saved.orderId || ''); return; }
+            showToast('⚠️ ไม่สามารถยืนยันผลการบันทึกได้ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่', 'error');
+            isSubmitting = false; setSubmitState('idle');
+        }
     });
 
     function resetForm() {
@@ -577,6 +642,8 @@
         document.getElementById('wizardSteps').style.display='flex';
         checkDepartment(); currentFilter='all';
         document.querySelectorAll('.cf-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+        isSubmitting = false; hasSubmitted = false; setSubmitState('idle');
+        renderProducts(); updateCartSummary();
         goToStep(1);
     }
 
