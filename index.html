@@ -3,390 +3,627 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบเบิกน้ำดื่ม</title>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>9 Singha Broker — Beverage Supply</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
+        /* ════════════════════════════════
+           2026 NEO-CORPORATE GLASSMORPHISM
+        ════════════════════════════════ */
         :root {
-            /* โทนสีฟ้าพรีเมียม สื่อถึงน้ำและความสะอาด */
-            --primary-color: #2563eb; 
-            --primary-hover: #1d4ed8;
-            --bg-color: #f0f9ff;
-            --card-bg: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-            --danger-color: #ef4444;
-            --edit-color: #f59e0b;
+            --brand-red:   #A31D24; 
+            --brand-red-hover: #8B1A1A;
+            --brand-gold:  #C49B4F;
+            --gold-light:  #E8D09E;
+            --bg-color:    #F0F4F8;
+            --surface:     rgba(255, 255, 255, 0.75);
+            --surface-solid: #FFFFFF;
+            --text-main:   #1A1D20;
+            --text-muted:  #64748B;
+            --border-color:rgba(255, 255, 255, 0.4);
+            --border-solid:#E2E8F0;
+            --shadow-glass: 0 16px 40px rgba(0, 0, 0, 0.05);
+            --radius-xl:   28px;
+            --radius-md:   16px;
+            --radius-sm:   10px;
+            --transition:  all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        body { font-family: 'Prompt', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .app-container { width: 100%; max-width: 600px; background: var(--card-bg); border-radius: 16px; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.1); overflow: hidden; position: relative; }
-        .header { background-color: var(--primary-color); color: white; padding: 25px 20px; text-align: center; }
-        .header h1 { margin: 0; font-size: 24px; font-weight: 600; }
-        .header p { margin: 5px 0 0; font-size: 14px; opacity: 0.9; }
-        .content { padding: 30px 25px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; }
-        input[type="text"], input[type="password"], input[type="number"], select, textarea { width: 100%; padding: 12px 15px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; font-family: 'Prompt', sans-serif; font-size: 14px; transition: all 0.3s; }
-        input:focus, select:focus, textarea:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
-        
-        .item-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
-        .item-card { display: flex; align-items: center; border: 1px solid var(--border-color); padding: 12px; border-radius: 10px; background: #fafafa; transition: border-color 0.3s; }
-        .item-card:hover { border-color: var(--primary-color); }
-        .item-card img { width: 55px; height: 55px; object-fit: cover; border-radius: 8px; margin-right: 15px; border: 1px solid #eee; background: white; }
-        .item-info { flex-grow: 1; }
-        .item-name { font-weight: 500; font-size: 15px; }
-        .item-stock { font-size: 13px; color: var(--text-muted); }
-        .item-qty { width: 85px !important; text-align: center; font-weight: 500;}
-        
-        .btn { width: 100%; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.3s; font-family: 'Prompt', sans-serif; }
-        .btn-submit { background-color: var(--primary-color); }
-        .btn-submit:hover { background-color: var(--primary-hover); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
-        .btn-submit:disabled { background-color: #94a3b8; cursor: not-allowed; box-shadow: none; }
-        
-        .admin-footer { text-align: center; padding: 15px; border-top: 1px solid var(--border-color); background: #f8fafc; }
-        .admin-link { color: var(--text-muted); font-size: 13px; text-decoration: none; cursor: pointer; transition: color 0.3s; }
-        .admin-link:hover { color: var(--primary-color); font-weight: 500; }
-        
-        #admin-login-view, #admin-dashboard-view { display: none; }
-        .loading-text { text-align: center; padding: 20px; color: var(--primary-color); font-size: 14px; font-weight: 500;}
 
-        /* สไตล์สำหรับหน้าแอดมิน */
-        .admin-box { background: #f1f5f9; border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; margin-bottom: 25px; }
-        .admin-list-item { display: flex; flex-direction: column; padding: 15px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 10px; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .admin-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .action-btns { display: flex; gap: 8px; }
-        .btn-small { padding: 6px 12px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; color: white; font-family: 'Prompt'; font-weight: 500;}
-        .btn-edit { background-color: var(--edit-color); }
-        .btn-delete { background-color: var(--danger-color); }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #0A0A0A;
+            background-image: 
+                radial-gradient(circle at 15% 10%, rgba(163, 29, 36, 0.06) 0%, transparent 40%),
+                radial-gradient(circle at 85% 90%, rgba(196, 155, 79, 0.08) 0%, transparent 40%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px 80px;
+            color: var(--cream);
+        }
+        
+        /* ใช้สีตัวอักษรหลักเป็นสีสว่างบนพื้นหลังดำ */
+        :root {
+            --cream:       #F7F3EC;
+            --cream-muted: #B8A98A;
+            --onyx:        #0D0D0D;
+            --onyx-soft:   #161616;
+            --onyx-mid:    #1E1E1E;
+            --onyx-border: #2A2A2A;
+            --success:     #5CBD7A;
+            --danger:      #C05050;
+        }
+
+        .shell { width: 100%; max-width: 580px; position: relative; }
+
+        /* ── HEADER ── */
+        .app-header { text-align: center; margin-bottom: 30px; position: relative; animation: fadeDown 0.5s ease; }
+        
+        .logo-box {
+            width: 56px; height: 56px;
+            background: linear-gradient(135deg, var(--brand-red), var(--brand-red-hover));
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-family: 'Playfair Display', serif; font-size: 28px;
+            margin: 0 auto 16px;
+            box-shadow: 0 8px 24px rgba(163, 29, 36, 0.25);
+            transform: rotate(45deg);
+        }
+        .logo-box span { transform: rotate(-45deg); }
+
+        .app-header h1 { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--brand-gold); letter-spacing: 2px; margin-bottom: 6px; text-shadow: 0 0 20px rgba(201,168,76,0.2);}
+        .app-header .tagline { font-size: 13px; color: var(--cream-muted); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 500; }
+
+        .admin-pill {
+            position: absolute; top: 0; right: 0;
+            background: transparent; border: 1px solid var(--onyx-border); color: var(--cream-muted);
+            padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 600; cursor: pointer; transition: var(--transition); text-transform: uppercase;
+        }
+        .admin-pill:hover { color: var(--brand-gold); border-color: var(--brand-gold); background: rgba(201,168,76,0.05); }
+
+        /* ── CARD ── */
+        .card {
+            background: var(--onyx-soft);
+            border: 1px solid var(--onyx-border);
+            border-radius: var(--radius-xl);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            overflow: hidden;
+            animation: fadeUp 0.6s ease;
+        }
+
+        /* ── STEP WIZARD ── */
+        .wizard-steps { display: flex; padding: 24px 32px; border-bottom: 1px solid var(--onyx-border); background: var(--onyx); }
+        .step-item { display: flex; align-items: center; gap: 10px; flex: 1; opacity: 0.4; transition: var(--transition); }
+        .step-item.active, .step-item.done { opacity: 1; }
+        .step-num { width: 30px; height: 30px; border-radius: 50%; background: transparent; border: 1.5px solid var(--onyx-border); color: var(--cream-muted); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; transition: var(--transition); }
+        .step-item.active .step-num { background: var(--brand-gold); color: var(--onyx); border-color: var(--brand-gold); box-shadow: 0 0 15px rgba(201,168,76,0.3); }
+        .step-item.done .step-num { background: var(--gold-dark); border-color: var(--gold-dark); color: var(--cream); }
+        .step-item.done .step-num::after { content: "✓"; }
+        .step-item.done .step-num span { display: none; }
+        .step-label { font-size: 13px; font-weight: 600; color: var(--cream-muted); }
+        .step-item.active .step-label { color: var(--brand-gold); }
+        .step-connector { flex: 1; height: 2px; background: var(--onyx-border); margin: 0 10px; border-radius: 2px; transition: var(--transition); }
+        .step-connector.done { background: var(--brand-gold); }
+
+        /* ── FORM ── */
+        .form-body { padding: 32px; }
+        .form-section { display: none; animation: fadeIn 0.4s ease; }
+        .form-section.active { display: block; }
+
+        .section-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(--brand-gold); margin-bottom: 24px; text-transform: uppercase; display: flex; align-items: center; gap: 10px;}
+        .section-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--gold-dark), transparent); }
+
+        .field-group { margin-bottom: 22px; }
+        .field-label { display: block; font-size: 13px; font-weight: 600; color: var(--cream-muted); margin-bottom: 8px; }
+        .req { color: var(--brand-gold); }
+        
+        input[type="text"], input[type="password"], input[type="number"], select, textarea {
+            width: 100%; background: var(--onyx-mid); border: 1px solid var(--onyx-border); border-radius: var(--radius-sm);
+            padding: 15px 18px; font-family: 'Sarabun', sans-serif; font-size: 14px; color: var(--cream); transition: var(--transition);
+            box-sizing: border-box;
+        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--brand-gold); box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15); background: #1C1C1C;}
+        
+        select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23B8A98A' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 18px center; }
+        select option { background: #1E1E1E; color: var(--cream); }
+
+        /* ── FILTER TABS ── */
+        .color-filter { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 24px; padding-bottom: 5px; }
+        .color-filter::-webkit-scrollbar { display: none; }
+        .cf-btn {
+            padding: 8px 18px; border-radius: 30px; border: 1px solid var(--onyx-border); background: transparent;
+            color: var(--cream-muted); font-family: 'Sarabun'; font-size: 13px; font-weight: 500; cursor: pointer; transition: var(--transition); white-space: nowrap;
+        }
+        .cf-btn:hover { border-color: var(--brand-gold); color: var(--cream); }
+        .cf-btn.active { background: var(--brand-gold); border-color: var(--brand-gold); color: var(--onyx); box-shadow: 0 4px 12px rgba(201,168,76,0.2); font-weight: 600;}
+
+        /* ── PRODUCTS ── */
+        .product-grid { display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
+        .product-card {
+            display: grid; grid-template-columns: 64px 1fr auto; align-items: center; gap: 16px; background: var(--onyx-mid); border: 1px solid var(--onyx-border);
+            border-radius: var(--radius-md); padding: 14px 16px; transition: var(--transition); position: relative; overflow: hidden;
+        }
+        .product-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: transparent; transition: var(--transition); }
+        .product-card:hover { border-color: #333; transform: translateX(2px); }
+        .product-card.has-qty { border-color: var(--gold-dark); background: rgba(201, 168, 76, 0.04); }
+        .product-card.has-qty::before { background: var(--brand-gold); }
+        .product-card.out-of-stock { opacity: 0.45; pointer-events: none; }
+        
+        .product-img { width: 64px; height: 64px; border-radius: var(--radius-sm); object-fit: cover; background: var(--onyx); border: 1px solid var(--onyx-border); }
+        .product-info { flex: 1; }
+        .product-name { font-weight: 600; font-size: 15px; color: var(--cream); margin-bottom: 4px; }
+        .product-stock { font-size: 12px; font-weight: 500; color: var(--success); }
+        .product-stock.out { color: var(--danger); }
+        
+        .qty-stepper { display: flex; align-items: center; border: 1px solid var(--onyx-border); border-radius: var(--radius-sm); overflow: hidden; background: var(--onyx); }
+        .qty-btn { width: 34px; height: 34px; background: transparent; border: none; color: var(--cream-muted); font-size: 18px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+        .qty-btn:hover:not(:disabled) { background: var(--brand-gold); color: var(--onyx); }
+        .qty-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .qty-input { width: 44px !important; height: 34px !important; border: none !important; border-left: 1px solid var(--onyx-border) !important; border-right: 1px solid var(--onyx-border) !important; border-radius: 0 !important; text-align: center; font-weight: 700; padding: 0 !important; box-shadow: none !important; color: var(--cream) !important; background: var(--onyx-mid) !important;}
+        
+        /* ── SUMMARY CART ── */
+        .cart-summary { background: linear-gradient(135deg, rgba(201, 168, 76, 0.1), rgba(201, 168, 76, 0.02)); border: 1px solid rgba(201, 168, 76, 0.3); border-radius: var(--radius-md); padding: 18px 24px; margin-bottom: 28px; display: none; }
+        .cart-summary.visible { display: block; animation: fadeUp 0.3s ease; }
+        .cart-summary-header { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--brand-gold); margin-bottom: 14px; text-transform: uppercase; border-bottom: 1px dashed rgba(201, 168, 76, 0.3); padding-bottom: 8px;}
+        .cart-items-list { display: flex; flex-direction: column; gap: 10px; }
+        .cart-row { display: flex; justify-content: space-between; font-size: 14px; color: var(--cream-muted); font-weight: 500; }
+        .cart-row strong { font-weight: 700; color: var(--cream); }
+
+        /* ── BUTTONS ── */
+        .btn-row { display: flex; gap: 12px; }
+        .btn { flex: 1; padding: 16px; border: none; border-radius: var(--radius-md); font-family: 'Sarabun'; font-size: 15px; font-weight: 700; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px; letter-spacing: 0.5px; text-transform: uppercase;}
+        .btn-primary { background: var(--brand-gold); color: var(--onyx); box-shadow: 0 4px 15px rgba(201,168,76,0.2); }
+        .btn-primary:hover:not(:disabled) { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(201,168,76,0.3); }
+        .btn-primary:disabled { background: var(--onyx-border); color: #555; box-shadow: none; cursor: not-allowed; transform: none; }
+        .btn-ghost { background: transparent; border: 1px solid var(--onyx-border); color: var(--cream-muted); }
+        .btn-ghost:hover { border-color: var(--cream); color: var(--cream); }
+
+        /* ── CONFIRM PAGE ── */
+        .confirm-block { background: var(--onyx-mid); border: 1px solid var(--onyx-border); border-radius: var(--radius-md); padding: 22px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .confirm-row { display: flex; justify-content: space-between; align-items:flex-start; padding: 12px 0; border-bottom: 1px dashed var(--onyx-border); font-size: 14px; }
+        .confirm-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .confirm-key { color: var(--cream-muted); min-width: 80px;}
+        .confirm-val { font-weight: 600; color: var(--cream); text-align: right; }
+
+        /* ── SUCCESS SCREEN ── */
+        .success-screen { text-align: center; padding: 50px 20px; display: none; }
+        .success-screen.active { display: block; animation: zoomIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .success-icon { width: 88px; height: 88px; border-radius: 50%; background: rgba(92,189,122,0.1); color: var(--success); border: 2px solid var(--success); display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 24px; box-shadow: 0 10px 25px rgba(92, 189, 122, 0.2); }
+        .success-screen h2 { font-family: 'Playfair Display', serif; color: var(--brand-gold); margin-bottom: 10px; font-size: 24px; letter-spacing: 1px;}
+
+        /* ── ADMIN SYSTEM ── */
+        #admin-login-view, #admin-dashboard-view { display: none; }
+        .admin-box { background: var(--onyx-soft); border: 1px solid var(--onyx-border); padding: 26px; border-radius: var(--radius-md); margin-bottom: 24px; }
+        .dash-tabs { display: flex; background: var(--onyx-mid); border: 1px solid var(--onyx-border); border-top: none; border-radius: 0 0 var(--radius-lg) var(--radius-lg); overflow: hidden; margin-bottom: 20px; }
+        .dash-tab { flex: 1; padding: 14px 8px; text-align: center; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--cream-muted); cursor: pointer; transition: var(--transition); border-bottom: 2px solid transparent; }
+        .dash-tab:hover { color: var(--cream); background: rgba(255,255,255,0.03); }
+        .dash-tab.active { color: var(--brand-gold); border-bottom-color: var(--brand-gold); background: rgba(201,168,76,0.04); }
+        .dash-section { display: none; }
+        .dash-section.active { display: block; animation: fadeIn 0.4s ease; }
+        .admin-list-item { display: flex; justify-content: space-between; align-items: center; padding: 18px; background: var(--onyx-mid); border: 1px solid var(--onyx-border); border-radius: var(--radius-md); margin-bottom: 12px; transition: 0.2s; }
+        .admin-list-item:hover { border-color: var(--brand-gold); }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        
+        .report-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 16px; background: transparent; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--onyx-border); }
+        .report-table th { background: var(--onyx); padding: 14px 12px; text-align: left; color: var(--brand-gold); font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
+        .report-table td { padding: 14px 12px; border-top: 1px solid var(--onyx-border); color: var(--cream); }
+
+        /* Animations */
+        @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes zoomIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        
+        /* Toast */
+        .toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: var(--onyx-mid); color: var(--cream); padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid var(--onyx-border); animation: fadeUp 0.3s ease, fadeDown 0.3s ease 2.7s forwards; }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
-        
-        <div id="user-view">
-            <div class="header">
-                <h1>💧 ระบบเบิกน้ำดื่มบริษัท</h1>
-                <p>กรุณากรอกข้อมูลเพื่อดำเนินการเบิกน้ำดื่ม</p>
+<div class="shell">
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ================= [ 1. USER VIEW ] ================= -->
+    <div id="user-view">
+        <div class="app-header">
+            <button class="admin-pill" onclick="switchView('admin-login-view')">Admin</button>
+            <div class="header-crown"><div class="header-line"></div><div class="header-diamond"></div><div class="header-line"></div></div>
+            <h1>9 SINGHA BROKER</h1>
+            <p class="tagline">ระบบเบิกน้ำดื่มและเครื่องดื่ม</p>
+        </div>
+
+        <div class="card" id="formCard">
+            <!-- Stepper -->
+            <div class="wizard-steps" id="wizardSteps">
+                <div class="step-item active" id="step-ind-1"><div class="step-num"><span>1</span></div><div class="step-label">ข้อมูล</div></div>
+                <div class="step-connector" id="conn-1-2"></div>
+                <div class="step-item" id="step-ind-2"><div class="step-num"><span>2</span></div><div class="step-label">เลือกของ</div></div>
+                <div class="step-connector" id="conn-2-3"></div>
+                <div class="step-item" id="step-ind-3"><div class="step-num"><span>3</span></div><div class="step-label">ยืนยัน</div></div>
             </div>
-            
-            <div class="content">
-                <form id="waterForm" onsubmit="submitForm(event)">
-                    <div class="form-group">
-                        <label>ชื่อ-นามสกุลผู้เบิก *</label>
-                        <input type="text" id="fullName" required placeholder="ระบุชื่อ-นามสกุล">
-                    </div>
+
+            <div class="form-body">
+                <form id="requestForm">
                     
-                    <div class="form-group">
-                        <label>สังกัด / แผนก *</label>
-                        <select id="department" required onchange="checkDepartment()">
-                            <option value="">-- กรุณาเลือกแผนก --</option>
-                            <option value="แม่บ้าน">แม่บ้าน</option>
-                            <option value="ฝ่ายทรัพยากรบุคคล (HR)">ฝ่ายทรัพยากรบุคคล (HR)</option>
-                            <option value="ฝ่ายบัญชีและการเงิน">ฝ่ายบัญชีและการเงิน</option>
-                            <option value="ฝ่ายขาย / Sales">ฝ่ายขาย / Sales</option>
-                            <option value="อื่นๆ">แผนกอื่นๆระบุ:</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group" id="otherDeptDiv" style="display: none;">
-                        <label>ระบุแผนกของคุณ *</label>
-                        <input type="text" id="otherDepartment" placeholder="พิมพ์ชื่อแผนก">
+                    <!-- STEP 1: ข้อมูลผู้เบิก -->
+                    <div class="form-section active" id="step-1">
+                        <div class="section-label">ข้อมูลผู้เบิก (Requester Info)</div>
+
+                        <div class="field-group">
+                            <label class="field-label">ชื่อ-นามสกุล <span class="req">*</span></label>
+                            <input type="text" id="fullName" required placeholder="ระบุชื่อ-นามสกุลผู้เบิก">
+                        </div>
+
+                        <div class="field-group">
+                            <label class="field-label">สังกัด / แผนก <span class="req">*</span></label>
+                            <select id="department" required onchange="checkDepartment()">
+                                <option value="">— กรุณาเลือกแผนก —</option>
+                                <option value="แม่บ้าน">แม่บ้าน</option>
+                                <option value="ฝ่ายทรัพยากรบุคคล (HR)">ฝ่ายทรัพยากรบุคคล (HR)</option>
+                                <option value="ฝ่ายบัญชีและการเงิน">ฝ่ายบัญชีและการเงิน</option>
+                                <option value="ฝ่ายขาย / Sales">ฝ่ายขาย / Sales</option>
+                                <option value="อื่นๆ">แผนกอื่นๆ (ระบุเพิ่มเติม)</option>
+                            </select>
+                        </div>
+                        <div class="field-group" id="otherDeptDiv" style="display:none">
+                            <input type="text" id="otherDepartment" placeholder="พิมพ์ชื่อแผนกของคุณ">
+                        </div>
+
+                        <!-- เพิ่มช่องวัตถุประสงค์ สำหรับระบบน้ำดื่ม -->
+                        <div class="field-group">
+                            <label class="field-label">วัตถุประสงค์ / หมายเหตุ <span class="req">*</span></label>
+                            <textarea id="purpose" rows="2" required placeholder="เช่น ใช้รับรองลูกค้า, ประชุมแผนก, ลงพื้นที่"></textarea>
+                        </div>
+
+                        <button type="button" class="btn btn-primary" onclick="goToStep2()">ถัดไป — เลือกรายการน้ำดื่ม</button>
                     </div>
 
-                    <div class="form-group">
-                        <label>วัตถุประสงค์ / หมายเหตุ *</label>
-                        <textarea id="purpose" rows="2" required placeholder="เช่น ใช้รับรองลูกค้า, ประชุมแผนก, ลงพื้นที่"></textarea>
+                    <!-- STEP 2: เลือกน้ำดื่ม -->
+                    <div class="form-section" id="step-2">
+                        <div class="section-label">เลือกรายการน้ำดื่ม (Beverages)</div>
+
+                        <div class="color-filter">
+                            <button type="button" class="cf-btn active" onclick="filterItems('all',this)">ทั้งหมด</button>
+                            <button type="button" class="cf-btn" onclick="filterItems('ขวดเล็ก',this)">💧 ขวดเล็ก</button>
+                            <button type="button" class="cf-btn" onclick="filterItems('ขวดใหญ่',this)">💦 ขวดใหญ่</button>
+                            <button type="button" class="cf-btn" onclick="filterItems('ลัง',this)">📦 ลัง/แพ็ค</button>
+                        </div>
+
+                        <div class="product-grid" id="productGrid">
+                            <div style="text-align:center; padding:30px; color:var(--text-muted);">กำลังโหลดข้อมูลสต๊อกน้ำดื่ม...</div>
+                        </div>
+
+                        <div class="cart-summary" id="cartSummary">
+                            <div class="cart-summary-header"><span>✦ รายการที่เลือก</span><span id="cartTotalCount"></span></div>
+                            <div class="cart-items-list" id="cartItemsList"></div>
+                        </div>
+
+                        <div class="btn-row">
+                            <button type="button" class="btn btn-ghost" style="flex:0 0 auto; padding:16px 20px;" onclick="goToStep(1)">← ย้อนกลับ</button>
+                            <button type="button" class="btn btn-primary" id="step2NextBtn" onclick="goToStep3()" disabled>ตรวจสอบรายการ</button>
+                        </div>
                     </div>
 
-                    <label style="margin-top: 25px;">รายการที่ต้องการเบิก (ใส่จำนวน)</label>
-                    <div class="item-list" id="itemListContainer">
-                        <div class="loading-text">⏳ กำลังโหลดรายการน้ำดื่มจากคลัง...</div>
-                    </div>
+                    <!-- STEP 3: ยืนยัน -->
+                    <div class="form-section" id="step-3">
+                        <div class="section-label">ตรวจสอบและยืนยัน (Confirm Order)</div>
 
-                    <button type="submit" id="submitBtn" class="btn btn-submit">ยืนยันการเบิก</button>
+                        <div class="confirm-block" id="confirmPersonal"></div>
+                        <div class="confirm-block" id="confirmItems"></div>
+
+                        <div class="btn-row">
+                            <button type="button" class="btn btn-ghost" style="flex:0 0 auto; padding:16px 20px;" onclick="goToStep(2)">← แก้ไข</button>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">ยืนยันการเบิกน้ำดื่ม</button>
+                        </div>
+                    </div>
                 </form>
-            </div>
-            <div class="admin-footer">
-                <a class="admin-link" onclick="switchView('admin-login-view')">⚙️ สำหรับผู้ดูแลระบบ (Admin)</a>
-            </div>
-        </div>
 
-        <div id="admin-login-view">
-            <div class="header" style="background-color: #0f172a;">
-                <h1>Admin Login</h1>
-                <p>ระบบจัดการคลังน้ำดื่ม</p>
-            </div>
-            <div class="content">
-                <div class="form-group">
-                    <label>รหัสผ่าน</label>
-                    <input type="password" id="adminPass" placeholder="กรอกรหัสผ่านแล้วกด Enter" onkeypress="if(event.key === 'Enter') loginAdmin()">
-                </div>
-                <button onclick="loginAdmin()" class="btn btn-submit" style="background-color: #0f172a;">เข้าสู่ระบบ</button>
-                <div style="text-align: center; margin-top: 25px;">
-                    <a class="admin-link" onclick="switchView('user-view')">← กลับไปหน้าเบิกน้ำดื่ม</a>
+                <!-- หน้า Success -->
+                <div class="success-screen" id="successScreen">
+                    <div class="success-icon">✓</div>
+                    <h2>SUCCESSFUL</h2>
+                    <p style="color: var(--text-muted); margin-bottom:30px;">รายการเบิกน้ำดื่มของคุณถูกบันทึกเรียบร้อยแล้ว<br>ขอบคุณครับ</p>
+                    <button class="btn btn-ghost" onclick="resetForm()">ทำรายการใหม่</button>
                 </div>
             </div>
         </div>
-
-        <div id="admin-dashboard-view">
-            <div class="header" style="background-color: #0f172a;">
-                <h1>จัดการสต๊อกน้ำดื่ม</h1>
-                <p>เพิ่ม / ลบ / อัปเดตสต๊อก</p>
-            </div>
-            <div class="content">
-                
-                <div class="admin-box">
-                    <h3 style="margin-top:0; font-size: 16px; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;" id="adminFormTitle">➕ เพิ่มรายการใหม่</h3>
-                    <div class="grid-2">
-                        <div class="form-group">
-                            <label>รหัส (เช่น W01)</label>
-                            <input type="text" id="itemId" placeholder="ห้ามซ้ำ">
-                        </div>
-                        <div class="form-group">
-                            <label>ชื่อรายการ</label>
-                            <input type="text" id="itemName" placeholder="เช่น น้ำดื่ม 600ml">
-                        </div>
-                    </div>
-                    <div class="grid-2">
-                        <div class="form-group">
-                            <label>หน่วยนับ</label>
-                            <input type="text" id="itemUnit" placeholder="เช่น ขวด, ลัง">
-                        </div>
-                        <div class="form-group">
-                            <label>จำนวนสต๊อก</label>
-                            <input type="number" id="itemStock" min="0">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>URL รูปภาพ (ถ้ามี)</label>
-                        <input type="text" id="itemImage" placeholder="https://...">
-                    </div>
-                    <div class="action-btns" style="margin-top: 20px;">
-                        <button onclick="saveItemAdmin()" id="btnSaveAdmin" class="btn btn-submit" style="background-color: #059669;">💾 บันทึกข้อมูล</button>
-                        <button onclick="clearAdminForm()" class="btn" style="background-color: #94a3b8; width: 40%;">ล้างค่า</button>
-                    </div>
-                </div>
-
-                <h3 style="font-size: 16px; display: flex; justify-content: space-between; align-items: center;">
-                    📦 รายการในคลัง
-                    <span id="stockCount" style="font-size: 12px; color: #64748b; font-weight: normal;"></span>
-                </h3>
-                <div id="adminStockContainer">
-                    <div class="loading-text">⏳ กำลังโหลดสต๊อก...</div>
-                </div>
-
-                <button onclick="switchView('user-view')" class="btn" style="background-color: #ef4444; margin-top: 30px;">🚪 ออกจากระบบ</button>
-            </div>
-        </div>
-
     </div>
 
-    <script>
-        // ⚠️ วาง URL Web App ของคุณที่นี่ครับ
-        const API_URL = "https://script.google.com/macros/s/AKfycbxHlw3dFpnuw221inL-9tffcQnzyknQXGdbWfLwnkm2NpywSVzIL0yaM6dmyUCz4Kj7/exec"; 
+    <!-- ================= [ 2. ADMIN LOGIN ] ================= -->
+    <div id="admin-login-view">
+        <div class="app-header">
+            <div class="logo-box" style="margin-bottom:20px;"><span>9</span></div>
+            <h1>ADMIN PORTAL</h1>
+        </div>
+        <div class="card" style="padding: 40px 30px;">
+            <div class="field-group">
+                <label class="field-label">รหัสผ่านผู้ดูแลระบบ</label>
+                <input type="password" id="adminPass" placeholder="กรอกรหัสผ่านแล้วกด Enter" onkeypress="if(event.key==='Enter') loginAdmin()">
+            </div>
+            <button type="button" class="btn btn-primary" onclick="loginAdmin()">Secure Login</button>
+            <div style="text-align:center; margin-top:24px; font-size:13px; font-weight:600; cursor:pointer; color:var(--text-muted);" onclick="switchView('user-view')">← กลับไปหน้าหลัก</div>
+        </div>
+    </div>
+
+    <!-- ================= [ 3. ADMIN DASHBOARD ] ================= -->
+    <div id="admin-dashboard-view">
+        <div class="app-header" style="margin-bottom:0; padding-bottom:20px;">
+            <h1 style="font-size:20px;">BEVERAGE DASHBOARD</h1>
+        </div>
+
+        <div class="dash-tabs" style="border-radius: 0; margin-bottom: 20px; border-left:none; border-right:none;">
+            <div class="dash-tab active" id="dtab-stock" onclick="switchAdminTab('stock')">📦 สต๊อกน้ำดื่ม</div>
+            <div class="dash-tab" id="dtab-history" onclick="switchAdminTab('history')">📜 ประวัติบิล</div>
+            <div class="dash-tab" id="dtab-report" onclick="switchAdminTab('report')">📊 สรุป AI</div>
+        </div>
+
+        <!-- Tab: สต๊อก -->
+        <div class="dash-section active" id="dash-stock">
+            <div class="admin-box">
+                <div class="section-label">เพิ่ม / แก้ไข รายการน้ำดื่ม</div>
+                <div class="grid-2">
+                    <div class="field-group"><label class="field-label">รหัส (SKU)</label><input type="text" id="itemId"></div>
+                    <div class="field-group"><label class="field-label">ชื่อรายการ</label><input type="text" id="itemName" placeholder="เช่น น้ำขวด 600ml"></div>
+                </div>
+                <div class="grid-2">
+                    <div class="field-group"><label class="field-label">หน่วยนับ</label><input type="text" id="itemUnit" value="ขวด"></div>
+                    <div class="field-group"><label class="field-label">จำนวนสต๊อก</label><input type="number" id="itemStock" min="0"></div>
+                </div>
+                <div class="field-group"><label class="field-label">URL รูปภาพ</label><input type="text" id="itemImage"></div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="saveItemAdmin()">บันทึกข้อมูล</button>
+                    <button class="btn btn-ghost" onclick="clearAdminForm()">ล้างค่า</button>
+                </div>
+            </div>
+            <div class="section-label">รายการสต๊อกคงเหลือ</div>
+            <div id="adminStockContainer"></div>
+        </div>
+
+        <!-- Tab: ประวัติ -->
+        <div class="dash-section" id="dash-history">
+            <div class="section-label" style="color:var(--brand-gold);">ตรวจเช็คบิล / ยกเลิกคืนสต๊อก</div>
+            <div id="adminHistoryContainer"></div>
+        </div>
+
+        <!-- Tab: รายงาน -->
+        <div class="dash-section" id="dash-report">
+            <div class="admin-box" style="padding: 20px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:20px; align-items:center;">
+                    <div class="section-label" style="margin:0;">รายงานสรุปผล</div>
+                    <select id="reportMonthFilter" onchange="generateReport()" style="width:auto; padding:8px 12px; border-radius:8px; font-weight:600; background: var(--onyx); color: var(--cream); border:1px solid var(--onyx-border);"></select>
+                </div>
+                <div class="grid-2" style="margin-bottom:20px;">
+                    <div style="background:var(--onyx-mid); padding:16px; border-radius:12px; text-align:center; border:1px solid var(--onyx-border);">
+                        <div style="font-size:12px; color:var(--cream-muted); font-weight:600; margin-bottom:4px;">ยอดบิลเบิก</div>
+                        <div style="font-size:26px; font-weight:700; color:var(--cream);" id="reportTotalOrders">0</div>
+                    </div>
+                    <div style="background:var(--onyx-mid); padding:16px; border-radius:12px; text-align:center; border:1px solid var(--onyx-border);">
+                        <div style="font-size:12px; color:var(--cream-muted); font-weight:600; margin-bottom:4px;">จำนวนที่เบิก (ชิ้น/ขวด)</div>
+                        <div style="font-size:26px; font-weight:700; color:var(--brand-gold);" id="reportTotalItems">0</div>
+                    </div>
+                </div>
+                
+                <div style="background:linear-gradient(135deg, rgba(201, 168, 76, 0.1), rgba(201, 168, 76, 0.02)); border:1px solid rgba(201, 168, 76, 0.3); padding:16px 20px; border-radius:12px; font-size:13px; margin-bottom:20px; line-height:1.6; color:var(--cream-muted);" id="aiInsightBox"></div>
+                
+                <table class="report-table">
+                    <thead><tr><th>รายการ</th><th style="text-align:center">เดิม</th><th style="text-align:center">เบิกไป</th><th style="text-align:center">คงเหลือ</th></tr></thead>
+                    <tbody id="reportTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <button class="btn btn-ghost" style="width:100%; border-color:var(--danger); color:var(--danger); margin-top:20px;" onclick="switchView('user-view')">🚪 ออกจากระบบ</button>
+    </div>
+</div>
+
+<script>
+    // ⚠️ นำ URL Web App ของคุณมาใส่ตรงนี้
+    const API_URL = "YOUR_WEBAPP_URL_HERE"; 
+
+    let globalItems = [], globalHistory = [], currentFilter = 'all', currentStep = 1;
+
+    window.onload = () => { fetchItems(); };
+
+    function showToast(msg, type = 'success') {
+        const c = document.getElementById('toastContainer');
+        const t = document.createElement('div'); t.className = 'toast'; 
+        t.style.borderColor = type === 'error' ? 'var(--danger)' : 'var(--brand-gold)';
+        t.innerText = msg;
+        c.appendChild(t); setTimeout(() => t.remove(), 3000);
+    }
+
+    function fetchItems() {
+        fetch(API_URL).then(r => r.json()).then(data => {
+            globalItems = data.items; globalHistory = data.history;
+            renderProducts(); renderAdminStock(globalItems); renderAdminHistory(globalHistory);
+            populateMonthFilter(); generateReport();
+        }).catch(e => console.log(e));
+    }
+
+    // --- User Flow ---
+    function setStepIndicator(step) {
+        [1,2,3].forEach(i => {
+            let el = document.getElementById(`step-ind-${i}`);
+            el.classList.remove('active', 'done');
+            if (i < step) el.classList.add('done');
+            else if (i === step) el.classList.add('active');
+        });
+        if(document.getElementById('conn-1-2')) document.getElementById('conn-1-2').classList.toggle('done', step > 1);
+        if(document.getElementById('conn-2-3')) document.getElementById('conn-2-3').classList.toggle('done', step > 2);
+    }
+
+    function goToStep(n) {
+        document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+        document.getElementById(`step-${n}`).classList.add('active');
+        currentStep = n; setStepIndicator(n);
+    }
+
+    function goToStep2() {
+        if (!document.getElementById('fullName').value || !document.getElementById('department').value || !document.getElementById('purpose').value) {
+            showToast('⚠️ กรุณากรอกข้อมูลให้ครบถ้วน', 'error'); return;
+        }
+        goToStep(2);
+    }
+
+    function goToStep3() {
+        let dept = document.getElementById('department').value === 'อื่นๆ' ? document.getElementById('otherDepartment').value : document.getElementById('department').value;
+        let purpose = document.getElementById('purpose').value;
         
-        let availableItems = []; 
+        document.getElementById('confirmPersonal').innerHTML = `<div style="font-size:11px; font-weight:700; color:var(--brand-gold); margin-bottom:12px; letter-spacing:1px;">ข้อมูลผู้เบิก & วัตถุประสงค์</div><div class="confirm-row"><span class="confirm-key">ชื่อ-นามสกุล</span><span class="confirm-val">${document.getElementById('fullName').value}</span></div><div class="confirm-row"><span class="confirm-key">แผนก</span><span class="confirm-val">${dept}</span></div><div class="confirm-row" style="flex-direction:column; border:none; padding-bottom:0;"><span class="confirm-key" style="margin-bottom:6px;">วัตถุประสงค์:</span><span class="confirm-val" style="text-align:left; background:var(--onyx); padding:10px; border-radius:6px; font-weight:400; color:var(--cream-muted); font-size:13px;">${purpose}</span></div>`;
+        
+        let rows = '';
+        document.querySelectorAll('.app-input').forEach(inp => {
+            let qty = parseInt(inp.value) || 0;
+            if(qty > 0) rows += `<div class="confirm-row"><span class="confirm-key">${inp.dataset.name}</span><span class="confirm-val" style="color:var(--brand-gold);">${qty} ${inp.dataset.unit}</span></div>`;
+        });
+        document.getElementById('confirmItems').innerHTML = `<div style="font-size:11px; font-weight:700; color:var(--brand-gold); margin-bottom:12px; letter-spacing:1px;">สรุปรายการน้ำดื่ม</div>${rows}`;
+        goToStep(3);
+    }
 
-        window.onload = function() { fetchItems(); };
+    function filterItems(kw, el) {
+        currentFilter = kw;
+        document.querySelectorAll('.cf-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active'); renderProducts();
+    }
 
-        function fetchItems() {
-            fetch(API_URL)
-                .then(response => response.json())
-                .then(data => {
-                    availableItems = data;
-                    renderItems(data);
-                    renderAdminStock(data);
-                })
-                .catch(error => console.error("Error fetching items:", error));
-        }
+    function renderProducts() {
+        const grid = document.getElementById('productGrid');
+        let items = currentFilter === 'all' ? globalItems : globalItems.filter(i => i.name.includes(currentFilter));
+        if (!items.length) { grid.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted); border:1px dashed var(--onyx-border); border-radius:12px;">ไม่พบรายการน้ำดื่มในหมวดหมู่นี้</div>`; return; }
 
-        // --- ส่วนของพนักงาน ---
-        function renderItems(items) {
-            const container = document.getElementById("itemListContainer");
-            container.innerHTML = ""; 
-            if (items.length === 0) { container.innerHTML = '<div class="loading-text">ไม่มีรายการในคลัง</div>'; return; }
+        grid.innerHTML = items.map(item => {
+            const oos = item.stock <= 0;
+            const img = item.image || `https://via.placeholder.com/150/0D0D0D/C9A84C?text=${encodeURIComponent(item.name.substring(0,3))}`;
+            return `
+            <div class="product-card ${oos ? 'out-of-stock' : ''}" id="pc-${item.id}" style="${oos?'opacity:0.5':''}">
+                <img class="product-img" src="${img}">
+                <div class="product-info">
+                    <div class="product-name">${item.name}</div>
+                    <div class="product-stock ${oos?'out':''}">${oos ? 'ของหมด' : 'พร้อมเบิก ' + item.stock + ' ' + item.unit}</div>
+                </div>
+                <div class="qty-stepper">
+                    <button type="button" class="qty-btn" onclick="changeQty('${item.id}', -1)" ${oos?'disabled':''}>−</button>
+                    <input type="number" class="qty-input app-input" id="qty-${item.id}" data-name="${item.name}" data-unit="${item.unit}" min="0" max="${item.stock}" value="0" ${oos?'disabled':''} oninput="onQtyChange('${item.id}')">
+                    <button type="button" class="qty-btn" onclick="changeQty('${item.id}', 1)" ${oos?'disabled':''}>+</button>
+                </div>
+            </div>`;
+        }).join('');
+    }
 
-            items.forEach((item) => {
-                const imgUrl = item.image ? item.image : `https://via.placeholder.com/100/e0f2fe/0284c7?text=${item.name}`;
-                const isOutOfStock = item.stock <= 0;
-                container.innerHTML += `
-                    <div class="item-card" style="${isOutOfStock ? 'opacity: 0.5; background: #f8fafc;' : ''}">
-                        <img src="${imgUrl}" alt="${item.name}">
-                        <div class="item-info">
-                            <div class="item-name">${item.name}</div>
-                            <div class="item-stock" style="${isOutOfStock ? 'color: #ef4444;' : 'color: #059669;'}">
-                                ${isOutOfStock ? 'สินค้าหมด' : 'พร้อมเบิก: ' + item.stock + ' ' + item.unit}
-                            </div>
-                        </div>
-                        <input type="number" class="item-qty app-input" data-name="${item.name}" data-unit="${item.unit}" min="0" max="${item.stock}" placeholder="จำนวน" ${isOutOfStock ? 'disabled' : ''}>
-                    </div>
-                `;
-            });
-        }
+    function changeQty(id, delta) {
+        let inp = document.getElementById(`qty-${id}`); if (!inp) return;
+        inp.value = Math.max(0, Math.min(parseInt(inp.max), (parseInt(inp.value)||0) + delta));
+        onQtyChange(id);
+    }
 
-        function submitForm(event) {
-            event.preventDefault(); 
-            const submitBtn = document.getElementById("submitBtn");
-            const inputs = document.querySelectorAll('.app-input');
-            let itemsDataArray = [], itemsSummaryText = [];
+    function onQtyChange(id) {
+        let inp = document.getElementById(`qty-${id}`);
+        document.getElementById(`pc-${id}`).classList.toggle('has-qty', (parseInt(inp.value)||0) > 0);
+        updateCartSummary();
+    }
 
-            inputs.forEach(input => {
-                let qty = parseInt(input.value);
-                if (qty > 0) {
-                    let name = input.getAttribute('data-name');
-                    let unit = input.getAttribute('data-unit');
-                    itemsDataArray.push({ name: name, qty: qty });
-                    itemsSummaryText.push(`- ${name} จำนวน ${qty} ${unit}`);
-                }
-            });
+    function updateCartSummary() {
+        let items = [];
+        document.querySelectorAll('.app-input').forEach(inp => {
+            let qty = parseInt(inp.value)||0; if(qty>0) items.push({name:inp.dataset.name, qty, unit:inp.dataset.unit});
+        });
+        const summary = document.getElementById('cartSummary'), list = document.getElementById('cartItemsList'), btn = document.getElementById('step2NextBtn');
+        if(!items.length) { summary.classList.remove('visible'); btn.disabled = true; return; }
+        summary.classList.add('visible'); btn.disabled = false;
+        document.getElementById('cartTotalCount').textContent = items.reduce((s,i)=>s+i.qty,0) + " รายการ";
+        list.innerHTML = items.map(i => `<div class="cart-row"><span>${i.name}</span><strong style="color:var(--brand-gold);">${i.qty} ${i.unit}</strong></div>`).join('');
+    }
 
-            if (itemsDataArray.length === 0) return alert("กรุณาระบุจำนวนที่ต้องการเบิกครับ");
+    document.getElementById('requestForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        let itemsDataArray = [];
+        document.querySelectorAll('.app-input').forEach(inp => {
+            let qty = parseInt(inp.value)||0; if(qty>0) itemsDataArray.push({name:inp.dataset.name, qty});
+        });
+        let btn = document.getElementById('submitBtn'); btn.disabled = true; btn.innerText = "กำลังบันทึกข้อมูล...";
+        
+        const payload = {
+            action: "request_items",
+            fullName: document.getElementById('fullName').value,
+            department: document.getElementById('department').value,
+            otherDepartment: document.getElementById('otherDepartment').value,
+            purpose: document.getElementById('purpose').value, // ส่งวัตถุประสงค์
+            itemsDataArray
+        };
 
-            const payload = {
-                action: "request_items", 
-                fullName: document.getElementById("fullName").value,
-                department: document.getElementById("department").value,
-                otherDepartment: document.getElementById("otherDepartment").value,
-                purpose: document.getElementById("purpose").value,
-                itemsDataArray: itemsDataArray,
-                itemsSummary: itemsSummaryText.join("\n")
-            };
-
-            submitBtn.innerText = "⏳ กำลังดำเนินการ...";
-            submitBtn.disabled = true;
-
-            fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === "success") {
-                    alert("✅ บันทึกการเบิกสำเร็จเรียบร้อยแล้ว!");
-                    document.getElementById("waterForm").reset(); 
-                    checkDepartment(); fetchItems(); 
-                }
-            })
-            .finally(() => { submitBtn.innerText = "ยืนยันการเบิก"; submitBtn.disabled = false; });
-        }
-
-        // --- ส่วนของแอดมิน ---
-        function renderAdminStock(items) {
-            const container = document.getElementById("adminStockContainer");
-            document.getElementById("stockCount").innerText = `(${items.length} รายการ)`;
-            container.innerHTML = "";
-            items.forEach(item => {
-                const itemJson = JSON.stringify(item).replace(/'/g, "&#39;");
-                container.innerHTML += `
-                <div class="admin-list-item">
-                    <div class="admin-item-header">
-                        <div style="font-weight: 500; color: #0f172a;">[${item.id}] ${item.name}</div>
-                        <div class="action-btns">
-                            <button onclick='editItem(${itemJson})' class="btn-small btn-edit">✏️ แก้ไข</button>
-                            <button onclick="deleteItem('${item.id}', '${item.name}')" class="btn-small btn-delete">🗑️ ลบ</button>
-                        </div>
-                    </div>
-                    <div style="font-size: 13px; color: #64748b; display: flex; justify-content: space-between;">
-                        <span>หน่วย: ${item.unit}</span>
-                        <span>คงเหลือ: <strong style="color:${item.stock <= 10 ? '#ef4444' : '#059669'}; font-size: 15px;">${item.stock}</strong></span>
-                    </div>
-                </div>`;
-            });
-        }
-
-        function editItem(item) {
-            document.getElementById("adminFormTitle").innerText = "✏️ แก้ไขข้อมูล";
-            document.getElementById("itemId").value = item.id;
-            document.getElementById("itemId").readOnly = true; 
-            document.getElementById("itemName").value = item.name;
-            document.getElementById("itemUnit").value = item.unit;
-            document.getElementById("itemStock").value = item.stock;
-            document.getElementById("itemImage").value = item.image;
-            window.scrollTo({ top: 0, behavior: 'smooth' }); 
-        }
-
-        function clearAdminForm() {
-            document.getElementById("adminFormTitle").innerText = "➕ เพิ่มรายการใหม่";
-            document.getElementById("itemId").value = "";
-            document.getElementById("itemId").readOnly = false;
-            document.getElementById("itemName").value = "";
-            document.getElementById("itemUnit").value = "";
-            document.getElementById("itemStock").value = "";
-            document.getElementById("itemImage").value = "";
-        }
-
-        function saveItemAdmin() {
-            const id = document.getElementById("itemId").value;
-            const name = document.getElementById("itemName").value;
-            if(!id || !name) return alert("กรุณากรอกรหัสและชื่อรายการครับ");
-
-            const payload = {
-                action: "save_item",
-                item: {
-                    id: id,
-                    name: name,
-                    unit: document.getElementById("itemUnit").value || "ชิ้น",
-                    stock: document.getElementById("itemStock").value || 0,
-                    image: document.getElementById("itemImage").value || ""
-                }
-            };
-
-            const btn = document.getElementById("btnSaveAdmin");
-            btn.innerText = "⏳ กำลังบันทึก..."; btn.disabled = true;
-
-            fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
-            .then(res => res.json())
-            .then(data => {
-                if(data.status === "success") {
-                    alert("✅ " + data.message);
-                    clearAdminForm();
-                    fetchItems(); 
-                }
-            })
-            .finally(() => { btn.innerText = "💾 บันทึกข้อมูล"; btn.disabled = false; });
-        }
-
-        function deleteItem(itemId, itemName) {
-            if(!confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบ "${itemName}" ออกจากสต๊อก?`)) return;
-
-            const payload = { action: "delete_item", itemId: itemId };
-
-            fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
-            .then(res => res.json())
-            .then(data => {
-                if(data.status === "success") {
-                    alert("🗑️ " + data.message);
-                    fetchItems(); 
-                }
-            });
-        }
-
-        function checkDepartment() {
-            const select = document.getElementById("department");
-            const otherDiv = document.getElementById("otherDeptDiv");
-            const otherInput = document.getElementById("otherDepartment");
-            if (select.value === "อื่นๆ") { otherDiv.style.display = "block"; otherInput.required = true; } 
-            else { otherDiv.style.display = "none"; otherInput.required = false; otherInput.value = ""; }
-        }
-
-        function switchView(viewId) {
-            document.getElementById("user-view").style.display = "none";
-            document.getElementById("admin-login-view").style.display = "none";
-            document.getElementById("admin-dashboard-view").style.display = "none";
-            document.getElementById(viewId).style.display = "block";
-            if (viewId === 'admin-dashboard-view') fetchItems();
-        }
-
-        function loginAdmin() {
-            const pass = document.getElementById("adminPass").value;
-            if (pass === "adminhr0208") {
-                document.getElementById("adminPass").value = ""; 
-                switchView("admin-dashboard-view");
-            } else {
-                alert("รหัสผ่านไม่ถูกต้อง");
+        fetch(API_URL, { method: "POST", headers: {"Content-Type":"text/plain"}, body: JSON.stringify(payload) })
+        .then(r => r.json()).then(data => {
+            if(data.status==="success") {
+                document.getElementById('wizardSteps').style.display='none';
+                document.querySelectorAll('.form-section').forEach(s=>s.classList.remove('active'));
+                document.getElementById('successScreen').classList.add('active');
+                fetchItems();
             }
+        }).finally(()=>{ btn.disabled=false; btn.innerText="ยืนยันการเบิกน้ำดื่ม"; });
+    });
+
+    function resetForm() {
+        document.getElementById('requestForm').reset();
+        document.getElementById('successScreen').classList.remove('active');
+        document.getElementById('wizardSteps').style.display='flex';
+        checkDepartment(); currentFilter='all';
+        document.querySelectorAll('.cf-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+        goToStep(1);
+    }
+
+    function checkDepartment() { document.getElementById('otherDeptDiv').style.display = document.getElementById('department').value === 'อื่นๆ' ? 'block' : 'none'; }
+
+    // --- Admin Flow ---
+    function switchView(v) { ['user-view','admin-login-view','admin-dashboard-view'].forEach(id=>document.getElementById(id).style.display='none'); document.getElementById(v).style.display='block'; if(v==='admin-dashboard-view')fetchItems(); }
+    function loginAdmin() { if(document.getElementById('adminPass').value==='adminhr0208'){document.getElementById('adminPass').value='';switchView('admin-dashboard-view');}else showToast('❌ รหัสผ่านไม่ถูกต้อง', 'error'); }
+    function switchAdminTab(t) { document.querySelectorAll('.dash-tab').forEach(x=>x.classList.remove('active')); document.querySelectorAll('.dash-section').forEach(x=>x.classList.remove('active')); document.getElementById('dtab-'+t).classList.add('active'); document.getElementById('dash-'+t).classList.add('active'); }
+
+    function renderAdminStock(items) {
+        document.getElementById('adminStockContainer').innerHTML = items.map(i => {
+            let json = JSON.stringify(i).replace(/'/g, "&#39;");
+            return `<div class="admin-list-item"><div><div style="font-size:11px;color:var(--text-muted);font-weight:600; letter-spacing:1px;">${i.id}</div><div style="font-weight:600; font-size:15px; color:var(--cream);">${i.name}</div></div><div style="display:flex;align-items:center;gap:14px;"><div style="font-weight:700;color:var(--success);font-size:16px;">${i.stock} <span style="font-size:12px;font-weight:500;">${i.unit}</span></div><button onclick='editItem(${json})' style="border:1px solid var(--onyx-border);background:var(--onyx);color:var(--cream-muted);padding:8px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-family:'Prompt';font-weight:600;">แก้ไข</button><button onclick="deleteItem('${i.id}')" style="border:1px solid rgba(192, 80, 80, 0.3);background:rgba(192, 80, 80, 0.1);color:var(--danger);padding:8px;border-radius:8px;cursor:pointer;">🗑</button></div></div>`;
+        }).join('');
+    }
+
+    function editItem(i) { document.getElementById('itemId').value=i.id; document.getElementById('itemId').readOnly=true; document.getElementById('itemName').value=i.name; document.getElementById('itemUnit').value=i.unit; document.getElementById('itemStock').value=i.stock; document.getElementById('itemImage').value=i.image; switchAdminTab('stock');}
+    function clearAdminForm() { ['itemId','itemName','itemStock','itemImage'].forEach(id=>document.getElementById(id).value=''); document.getElementById('itemId').readOnly=false; document.getElementById('itemUnit').value='ขวด'; }
+    function saveItemAdmin() {
+        let payload = { action:"save_item", item:{id:document.getElementById('itemId').value, name:document.getElementById('itemName').value, unit:document.getElementById('itemUnit').value||'ขวด', stock:document.getElementById('itemStock').value||0, image:document.getElementById('itemImage').value||''} };
+        fetch(API_URL, {method:"POST",body:JSON.stringify(payload)}).then(r=>r.json()).then(d=>{showToast('✅ บันทึกสต๊อกสำเร็จ');clearAdminForm();fetchItems();});
+    }
+    function deleteItem(id) { if(confirm('ลบรายการน้ำดื่มนี้ออกจากระบบ?')) fetch(API_URL,{method:"POST",body:JSON.stringify({action:"delete_item",itemId:id})}).then(r=>r.json()).then(d=>{fetchItems();}); }
+
+    function renderAdminHistory(recs) {
+        document.getElementById('adminHistoryContainer').innerHTML = recs.map(r => `<div class="history-item"><div class="history-item-header"><div><strong style="color:var(--brand-gold); font-size:14px; letter-spacing:1px;">${r.orderId}</strong> <div style="font-size:12px;color:var(--cream-muted); margin-top:4px;">📅 ${new Date(r.timestamp).toLocaleDateString('th-TH')} | 👤 ${r.name}</div></div><button onclick="cancelOrder('${r.orderId}',${r.rowIdx})" style="border:1px solid var(--danger);background:transparent;color:var(--danger);border-radius:6px;font-size:11px;padding:6px 12px;cursor:pointer;font-family:'Prompt';font-weight:600;">ยกเลิกบิล</button></div><div style="font-size:12px; color:var(--cream-muted); margin-bottom:8px;"><strong>วัตถุประสงค์:</strong> ${r.purpose}</div><div class="history-summary" style="color:var(--cream);">${r.summary}</div></div>`).join('');
+    }
+    function cancelOrder(id, idx) { if(confirm('ต้องการยกเลิกบิลเบิกน้ำดื่มนี้และคืนยอดเข้าสต๊อกใช่หรือไม่?')) fetch(API_URL,{method:"POST",body:JSON.stringify({action:"cancel_order",orderId:id,rowIdx:idx})}).then(r=>r.json()).then(d=>{showToast('✅ ยกเลิกและคืนสต๊อกเรียบร้อย');fetchItems();}); }
+
+    function populateMonthFilter() {
+        let sel = document.getElementById('reportMonthFilter'); sel.innerHTML = '<option value="all">ทั้งหมด (All Time)</option>';
+        let mSet = new Set(); globalHistory.forEach(r=>{let d=new Date(r.timestamp); mSet.add(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);});
+        [...mSet].sort().reverse().forEach(m => sel.innerHTML+=`<option value="${m}">${m}</option>`);
+    }
+    function generateReport() {
+        let filter = document.getElementById('reportMonthFilter').value, stats = {};
+        globalItems.forEach(i => stats[i.name] = { orig:0, all:0, per:0, rem:parseInt(i.stock) });
+        globalHistory.forEach(r => { if(r.rawItems) try{JSON.parse(r.rawItems).forEach(i=>{if(stats[i.name])stats[i.name].all+=parseInt(i.qty)});}catch(e){} });
+        for(let k in stats) stats[k].orig = stats[k].rem + stats[k].all;
+        let filHist = globalHistory.filter(r => filter==='all'||`${new Date(r.timestamp).getFullYear()}-${String(new Date(r.timestamp).getMonth()+1).padStart(2,'0')}`===filter);
+        let totI = 0, top = '-', maxD = 0;
+        filHist.forEach(r => { if(r.rawItems) try{JSON.parse(r.rawItems).forEach(i=>{if(stats[i.name]){stats[i.name].per+=parseInt(i.qty); totI+=parseInt(i.qty);}});}catch(e){} });
+        document.getElementById('reportTotalOrders').innerText = filHist.length; document.getElementById('reportTotalItems').innerText = totI;
+        document.getElementById('reportTableBody').innerHTML = '';
+        for(let k in stats) {
+            let s = stats[k]; if(s.per>maxD){maxD=s.per;top=k;}
+            if(s.orig>0) document.getElementById('reportTableBody').innerHTML += `<tr><td style="font-weight:500;">${k}</td><td align="center" style="color:var(--cream-muted);">${s.orig}</td><td align="center" style="color:var(--brand-gold);font-weight:bold;">${s.per}</td><td align="center" style="color:var(--success);font-weight:bold;">${s.rem}</td></tr>`;
         }
-    </script>
+        document.getElementById('aiInsightBox').innerHTML = totI ? `<b>✦ AI Insight:</b> น้ำดื่มที่ถูกเบิกบ่อยที่สุดคือ <b style="color:var(--brand-gold);">${top}</b> มีการเบิกไปแล้ว ${maxD} รายการ ${stats[top].rem<=20?'<br><span style="color:var(--danger); margin-top:5px; display:inline-block;">⚠️ แจ้งเตือน: สต๊อกเหลือน้อย ควรพิจารณาสั่งซื้อน้ำดื่มเพิ่มครับ</span>':''}` : 'ยังไม่มีข้อมูลการเบิกในช่วงเวลานี้';
+    }
+</script>
 </body>
-
 </html>
-
