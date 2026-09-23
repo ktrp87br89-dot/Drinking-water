@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>9 Singha Broker — Beverage Supply</title>
+    <title>9 Singha Broker — ระบบเบิกน้ำดื่ม</title>
+    <meta name="theme-color" content="#0B84C6">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
@@ -13,13 +14,16 @@
         :root {
             --brand-red:   #A31D24; 
             --brand-red-hover: #8B1A1A;
-            --brand-gold:  #C49B4F;
-            --gold-light:  #E8D09E;
+            --brand-gold:  #0B84C6;
+            --gold-light:  #22A6E8;
+            --gold-dark:   #9FD3F2;
+            --deep-sea:    #0A4F86;
+            --aqua:        #1FC8DB;
             --bg-color:    #F0F4F8;
             --surface:     rgba(255, 255, 255, 0.75);
             --surface-solid: #FFFFFF;
             --text-main:   #1A1D20;
-            --text-muted:  #64748B;
+            --text-muted:  #56708C;
             --border-color:rgba(255, 255, 255, 0.4);
             --border-solid:#E2E8F0;
             --shadow-glass: 0 16px 40px rgba(0, 0, 0, 0.05);
@@ -33,10 +37,11 @@
 
         body {
             font-family: 'Sarabun', sans-serif;
-            background-color: #0A0A0A;
-            background-image: 
-                radial-gradient(circle at 15% 10%, rgba(163, 29, 36, 0.06) 0%, transparent 40%),
-                radial-gradient(circle at 85% 90%, rgba(196, 155, 79, 0.08) 0%, transparent 40%);
+            background-color: #EAF6FD;
+            background-image:
+                radial-gradient(circle at 12% 8%, rgba(31, 200, 219, 0.22) 0%, transparent 38%),
+                radial-gradient(circle at 88% 20%, rgba(11, 132, 198, 0.16) 0%, transparent 40%),
+                linear-gradient(180deg, #F4FBFF 0%, #E3F2FC 55%, #D3EBFA 100%);
             background-attachment: fixed;
             min-height: 100vh;
             display: flex;
@@ -48,14 +53,14 @@
         
         /* ใช้สีตัวอักษรหลักเป็นสีสว่างบนพื้นหลังดำ */
         :root {
-            --cream:       #F7F3EC;
-            --cream-muted: #B8A98A;
-            --onyx:        #0D0D0D;
-            --onyx-soft:   #161616;
-            --onyx-mid:    #1E1E1E;
-            --onyx-border: #2A2A2A;
-            --success:     #5CBD7A;
-            --danger:      #C05050;
+            --cream:       #0E2A47;
+            --cream-muted: #56708C;
+            --onyx:        #FFFFFF;
+            --onyx-soft:   rgba(255,255,255,0.86);
+            --onyx-mid:    #F3F9FE;
+            --onyx-border: #D5E7F5;
+            --success:     #12A37A;
+            --danger:      #D9464F;
         }
 
         .shell { width: 100%; max-width: 580px; position: relative; }
@@ -75,7 +80,7 @@
         }
         .logo-box span { transform: rotate(-45deg); }
 
-        .app-header h1 { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--brand-gold); letter-spacing: 2px; margin-bottom: 6px; text-shadow: 0 0 20px rgba(201,168,76,0.2);}
+        .app-header h1 { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--brand-gold); letter-spacing: 2px; margin-bottom: 6px; text-shadow: 0 0 20px rgba(11, 132, 198,0.2);}
         .app-header .tagline { font-size: 13px; color: var(--cream-muted); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 500; }
 
         .admin-pill {
@@ -83,14 +88,14 @@
             background: transparent; border: 1px solid var(--onyx-border); color: var(--cream-muted);
             padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 600; cursor: pointer; transition: var(--transition); text-transform: uppercase;
         }
-        .admin-pill:hover { color: var(--brand-gold); border-color: var(--brand-gold); background: rgba(201,168,76,0.05); }
+        .admin-pill:hover { color: var(--brand-gold); border-color: var(--brand-gold); background: rgba(11, 132, 198,0.05); }
 
         /* ── CARD ── */
         .card {
             background: var(--onyx-soft);
             border: 1px solid var(--onyx-border);
             border-radius: var(--radius-xl);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            box-shadow: 0 24px 60px rgba(10, 79, 134, 0.14); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
             overflow: hidden;
             animation: fadeUp 0.6s ease;
         }
@@ -100,7 +105,7 @@
         .step-item { display: flex; align-items: center; gap: 10px; flex: 1; opacity: 0.4; transition: var(--transition); }
         .step-item.active, .step-item.done { opacity: 1; }
         .step-num { width: 30px; height: 30px; border-radius: 50%; background: transparent; border: 1.5px solid var(--onyx-border); color: var(--cream-muted); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; transition: var(--transition); }
-        .step-item.active .step-num { background: var(--brand-gold); color: var(--onyx); border-color: var(--brand-gold); box-shadow: 0 0 15px rgba(201,168,76,0.3); }
+        .step-item.active .step-num { background: var(--brand-gold); color: var(--onyx); border-color: var(--brand-gold); box-shadow: 0 0 15px rgba(11, 132, 198,0.3); }
         .step-item.done .step-num { background: var(--gold-dark); border-color: var(--gold-dark); color: var(--cream); }
         .step-item.done .step-num::after { content: "✓"; }
         .step-item.done .step-num span { display: none; }
@@ -114,7 +119,7 @@
         .form-section { display: none; animation: fadeIn 0.4s ease; }
         .form-section.active { display: block; }
 
-        .section-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(--brand-gold); margin-bottom: 24px; text-transform: uppercase; display: flex; align-items: center; gap: 10px;}
+        .section-label { font-size: 12px; font-weight: 700; letter-spacing: 0.5px; color: var(--brand-gold); margin-bottom: 24px; text-transform: uppercase; display: flex; align-items: center; gap: 10px;}
         .section-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--gold-dark), transparent); }
 
         .field-group { margin-bottom: 22px; }
@@ -126,10 +131,10 @@
             padding: 15px 18px; font-family: 'Sarabun', sans-serif; font-size: 14px; color: var(--cream); transition: var(--transition);
             box-sizing: border-box;
         }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--brand-gold); box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15); background: #1C1C1C;}
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--brand-gold); box-shadow: 0 0 0 3px rgba(11, 132, 198, 0.15); background: #FFFFFF;}
         
-        select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23B8A98A' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 18px center; }
-        select option { background: #1E1E1E; color: var(--cream); }
+        select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%230B84C6' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 18px center; }
+        select option { background: #FFFFFF; color: var(--cream); }
 
         /* ── FILTER TABS ── */
         .color-filter { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 24px; padding-bottom: 5px; }
@@ -139,7 +144,7 @@
             color: var(--cream-muted); font-family: 'Sarabun'; font-size: 13px; font-weight: 500; cursor: pointer; transition: var(--transition); white-space: nowrap;
         }
         .cf-btn:hover { border-color: var(--brand-gold); color: var(--cream); }
-        .cf-btn.active { background: var(--brand-gold); border-color: var(--brand-gold); color: var(--onyx); box-shadow: 0 4px 12px rgba(201,168,76,0.2); font-weight: 600;}
+        .cf-btn.active { background: var(--brand-gold); border-color: var(--brand-gold); color: var(--onyx); box-shadow: 0 4px 12px rgba(11, 132, 198,0.2); font-weight: 600;}
 
         /* ── PRODUCTS ── */
         .product-grid { display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
@@ -148,8 +153,8 @@
             border-radius: var(--radius-md); padding: 14px 16px; transition: var(--transition); position: relative; overflow: hidden;
         }
         .product-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: transparent; transition: var(--transition); }
-        .product-card:hover { border-color: #333; transform: translateX(2px); }
-        .product-card.has-qty { border-color: var(--gold-dark); background: rgba(201, 168, 76, 0.04); }
+        .product-card:hover { border-color: var(--gold-dark); transform: translateX(2px); }
+        .product-card.has-qty { border-color: var(--gold-dark); background: rgba(11, 132, 198, 0.04); }
         .product-card.has-qty::before { background: var(--brand-gold); }
         .product-card.out-of-stock { opacity: 0.45; pointer-events: none; }
         
@@ -166,9 +171,9 @@
         .qty-input { width: 44px !important; height: 34px !important; border: none !important; border-left: 1px solid var(--onyx-border) !important; border-right: 1px solid var(--onyx-border) !important; border-radius: 0 !important; text-align: center; font-weight: 700; padding: 0 !important; box-shadow: none !important; color: var(--cream) !important; background: var(--onyx-mid) !important;}
         
         /* ── SUMMARY CART ── */
-        .cart-summary { background: linear-gradient(135deg, rgba(201, 168, 76, 0.1), rgba(201, 168, 76, 0.02)); border: 1px solid rgba(201, 168, 76, 0.3); border-radius: var(--radius-md); padding: 18px 24px; margin-bottom: 28px; display: none; }
+        .cart-summary { background: linear-gradient(135deg, rgba(11, 132, 198, 0.1), rgba(11, 132, 198, 0.02)); border: 1px solid rgba(11, 132, 198, 0.3); border-radius: var(--radius-md); padding: 18px 24px; margin-bottom: 28px; display: none; }
         .cart-summary.visible { display: block; animation: fadeUp 0.3s ease; }
-        .cart-summary-header { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--brand-gold); margin-bottom: 14px; text-transform: uppercase; border-bottom: 1px dashed rgba(201, 168, 76, 0.3); padding-bottom: 8px;}
+        .cart-summary-header { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--brand-gold); margin-bottom: 14px; text-transform: uppercase; border-bottom: 1px dashed rgba(11, 132, 198, 0.3); padding-bottom: 8px;}
         .cart-items-list { display: flex; flex-direction: column; gap: 10px; }
         .cart-row { display: flex; justify-content: space-between; font-size: 14px; color: var(--cream-muted); font-weight: 500; }
         .cart-row strong { font-weight: 700; color: var(--cream); }
@@ -176,14 +181,14 @@
         /* ── BUTTONS ── */
         .btn-row { display: flex; gap: 12px; }
         .btn { flex: 1; padding: 16px; border: none; border-radius: var(--radius-md); font-family: 'Sarabun'; font-size: 15px; font-weight: 700; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px; letter-spacing: 0.5px; text-transform: uppercase;}
-        .btn-primary { background: var(--brand-gold); color: var(--onyx); box-shadow: 0 4px 15px rgba(201,168,76,0.2); }
-        .btn-primary:hover:not(:disabled) { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(201,168,76,0.3); }
-        .btn-primary:disabled { background: var(--onyx-border); color: #555; box-shadow: none; cursor: not-allowed; transform: none; }
+        .btn-primary { background: var(--brand-gold); color: var(--onyx); box-shadow: 0 4px 15px rgba(11, 132, 198,0.2); }
+        .btn-primary:hover:not(:disabled) { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(11, 132, 198,0.3); }
+        .btn-primary:disabled { background: var(--onyx-border); color: #8CA3B8; box-shadow: none; cursor: not-allowed; transform: none; }
         .btn-ghost { background: transparent; border: 1px solid var(--onyx-border); color: var(--cream-muted); }
         .btn-ghost:hover { border-color: var(--cream); color: var(--cream); }
 
         /* ── CONFIRM PAGE ── */
-        .confirm-block { background: var(--onyx-mid); border: 1px solid var(--onyx-border); border-radius: var(--radius-md); padding: 22px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .confirm-block { background: var(--onyx-mid); border: 1px solid var(--onyx-border); border-radius: var(--radius-md); padding: 22px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(10,79,134,0.05); }
         .confirm-row { display: flex; justify-content: space-between; align-items:flex-start; padding: 12px 0; border-bottom: 1px dashed var(--onyx-border); font-size: 14px; }
         .confirm-row:last-child { border-bottom: none; padding-bottom: 0; }
         .confirm-key { color: var(--cream-muted); min-width: 80px;}
@@ -201,7 +206,7 @@
         .dash-tabs { display: flex; background: var(--onyx-mid); border: 1px solid var(--onyx-border); border-top: none; border-radius: 0 0 var(--radius-lg) var(--radius-lg); overflow: hidden; margin-bottom: 20px; }
         .dash-tab { flex: 1; padding: 14px 8px; text-align: center; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--cream-muted); cursor: pointer; transition: var(--transition); border-bottom: 2px solid transparent; }
         .dash-tab:hover { color: var(--cream); background: rgba(255,255,255,0.03); }
-        .dash-tab.active { color: var(--brand-gold); border-bottom-color: var(--brand-gold); background: rgba(201,168,76,0.04); }
+        .dash-tab.active { color: var(--brand-gold); border-bottom-color: var(--brand-gold); background: rgba(11, 132, 198,0.04); }
         .dash-section { display: none; }
         .dash-section.active { display: block; animation: fadeIn 0.4s ease; }
         .admin-list-item { display: flex; justify-content: space-between; align-items: center; padding: 18px; background: var(--onyx-mid); border: 1px solid var(--onyx-border); border-radius: var(--radius-md); margin-bottom: 12px; transition: 0.2s; }
@@ -220,10 +225,67 @@
         
         /* Toast */
         .toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .toast { background: var(--onyx-mid); color: var(--cream); padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid var(--onyx-border); animation: fadeUp 0.3s ease, fadeDown 0.3s ease 2.7s forwards; }
+        .toast { background: var(--onyx-mid); color: var(--cream); padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: 600; box-shadow: 0 10px 30px rgba(10,79,134,0.18); border: 1px solid var(--onyx-border); animation: fadeUp 0.3s ease, fadeDown 0.3s ease 2.7s forwards; }
+
+        /* ════════ WATER THEME ════════ */
+        .shell { z-index: 1; }
+        .app-header h1 { background: linear-gradient(90deg, var(--deep-sea), var(--brand-gold) 55%, var(--aqua)); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; font-size: 24px; }
+        .app-header .tagline { color: var(--deep-sea); font-weight: 600; }
+        .drop-logo { width: 62px; height: 62px; margin: 0 auto 12px; filter: drop-shadow(0 10px 16px rgba(11,132,198,0.28)); animation: floaty 4s ease-in-out infinite; }
+        .drop-logo svg { width: 100%; height: 100%; }
+        .logo-box { background: linear-gradient(135deg, var(--aqua), var(--deep-sea)); box-shadow: 0 8px 24px rgba(11,132,198,0.3); }
+        .admin-pill { background: rgba(255,255,255,0.7); }
+        .wizard-steps { background: linear-gradient(180deg, #F7FCFF, #EEF7FD); }
+        .step-item.done .step-num { background: var(--aqua); border-color: var(--aqua); color: #fff; }
+        .step-connector.done { background: linear-gradient(90deg, var(--aqua), var(--brand-gold)); }
+        .btn-primary { background: linear-gradient(135deg, var(--gold-light), var(--deep-sea)); color: #fff; }
+        .btn-primary:hover:not(:disabled) { background: linear-gradient(135deg, var(--aqua), var(--brand-gold)); color: #fff; }
+        .btn-primary:disabled { background: #E3EEF6; }
+        .btn-ghost { background: rgba(255,255,255,0.7); }
+        .btn-ghost:hover { border-color: var(--brand-gold); color: var(--brand-gold); }
+        .cf-btn { background: #fff; }
+        .cf-btn.active { background: linear-gradient(135deg, var(--gold-light), var(--deep-sea)); color: #fff; border-color: transparent; }
+        .qty-btn { color: var(--brand-gold); }
+        .qty-btn:hover:not(:disabled) { background: var(--brand-gold); color: #fff; }
+        .product-card { background: #fff; }
+        .product-card.has-qty { border-color: var(--gold-light); background: #F0F9FF; }
+        .product-card.has-qty::before { background: linear-gradient(180deg, var(--aqua), var(--deep-sea)); width: 4px; }
+        .product-img { background: #E6F4FC; }
+        .confirm-block { background: #fff; }
+        .success-icon { background: linear-gradient(135deg, #E0F7FB, #D6EEFB); border-color: var(--gold-light); box-shadow: 0 12px 30px rgba(11,132,198,0.22); }
+        .success-screen h2 { font-family: 'Sarabun', sans-serif; font-weight: 700; color: var(--deep-sea); }
+        .report-table th { background: #EEF7FD; color: var(--deep-sea); }
+        .toast { background: #fff; }
+        input::placeholder, textarea::placeholder { color: #9AB0C4; }
+
+        .water-bg { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+        .wave { position: absolute; left: 0; bottom: 0; width: 200%; height: 160px; }
+        .wave-back { fill: rgba(34,166,232,0.16); animation: waveMove 18s linear infinite; }
+        .wave-front { fill: rgba(11,132,198,0.14); height: 120px; animation: waveMove 11s linear infinite reverse; }
+        .bubble { position: absolute; bottom: -30px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.95), rgba(95,212,244,0.35) 60%, rgba(11,132,198,0.15)); border: 1px solid rgba(255,255,255,0.7); animation-name: rise; animation-timing-function: ease-in; animation-iteration-count: infinite; }
+        @keyframes waveMove { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        @keyframes rise { 0% { transform: translateY(0) translateX(0); opacity: 0; } 10% { opacity: 1; } 100% { transform: translateY(-105vh) translateX(20px); opacity: 0; } }
+        @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        @media (prefers-reduced-motion: reduce) { .wave, .bubble, .drop-logo { animation: none !important; } .bubble { display: none; } }
+        #step-1 > .btn { width: 100%; }
+        .wizard-steps { align-items: center; }
+        .step-label { white-space: nowrap; }
+        .toast { white-space: nowrap; max-width: 92vw; overflow: hidden; text-overflow: ellipsis; }
+        @media (max-width: 520px) { .step-item:not(.active) .step-label { display: none; } .step-item { flex: 0 0 auto; } .step-connector { margin: 0 8px; } .success-screen p { font-size: 14px; } }
+        @media (max-width: 520px) { .form-body { padding: 22px 18px; } .wizard-steps { padding: 18px 16px; } .step-label { font-size: 12px; } .admin-pill { position: static; margin-bottom: 10px; } }
     </style>
 </head>
 <body>
+
+<div class="water-bg" aria-hidden="true">
+    <span class="bubble" style="left:8%;  width:14px;height:14px;animation-duration:14s;"></span>
+    <span class="bubble" style="left:22%; width:8px; height:8px; animation-duration:10s;animation-delay:3s;"></span>
+    <span class="bubble" style="left:47%; width:18px;height:18px;animation-duration:17s;animation-delay:6s;"></span>
+    <span class="bubble" style="left:71%; width:10px;height:10px;animation-duration:12s;animation-delay:1s;"></span>
+    <span class="bubble" style="left:88%; width:16px;height:16px;animation-duration:15s;animation-delay:8s;"></span>
+    <svg class="wave wave-back" viewBox="0 0 1440 200" preserveAspectRatio="none"><path d="M0 90 C 240 30 480 150 720 90 S 1200 30 1440 90 V200 H0Z"/></svg>
+    <svg class="wave wave-front" viewBox="0 0 1440 200" preserveAspectRatio="none"><path d="M0 120 C 260 70 520 170 780 115 S 1260 70 1440 120 V200 H0Z"/></svg>
+</div>
 
 <div class="shell">
     <div class="toast-container" id="toastContainer"></div>
@@ -232,7 +294,12 @@
     <div id="user-view">
         <div class="app-header">
             <button class="admin-pill" onclick="switchView('admin-login-view')">Admin</button>
-            <div class="header-crown"><div class="header-line"></div><div class="header-diamond"></div><div class="header-line"></div></div>
+            <div class="drop-logo" aria-hidden="true">
+                <svg viewBox="0 0 64 64"><defs><linearGradient id="dg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5FD4F4"/><stop offset="1" stop-color="#0A6FB0"/></linearGradient></defs>
+                <path d="M32 4C32 4 12 27 12 40a20 20 0 0 0 40 0C52 27 32 4 32 4z" fill="url(#dg)"/>
+                <ellipse cx="22" cy="30" rx="3.2" ry="6" fill="#fff" opacity=".55" transform="rotate(25 22 30)"/>
+                <text x="33" y="47" text-anchor="middle" font-family="Playfair Display, serif" font-size="17" font-weight="700" fill="#fff">9</text></svg>
+            </div>
             <h1>9 SINGHA BROKER</h1>
             <p class="tagline">ระบบเบิกน้ำดื่มและเครื่องดื่ม</p>
         </div>
@@ -325,11 +392,11 @@
 
                 <!-- หน้า Success -->
                 <div class="success-screen" id="successScreen">
-                    <div class="success-icon">✓</div>
-                    <h2>SUCCESSFUL</h2>
-                    <p style="color: var(--cream-muted); margin-bottom:10px;">เบิกน้ำดื่มสำเร็จ รายการของคุณถูกบันทึกเรียบร้อยแล้ว<br>ขอบคุณครับ</p>
+                    <div class="success-icon">💧</div>
+                    <h2>เบิกน้ำดื่มสำเร็จ</h2>
+                    <p style="color: var(--cream-muted); margin-bottom:10px;">รายการเบิกของคุณถูกบันทึกเรียบร้อยแล้ว<br>ขอบคุณครับ</p>
                     <p id="successOrderId" style="color: var(--brand-gold); font-weight:700; letter-spacing:1px; margin-bottom:30px;"></p>
-                    <button class="btn btn-ghost" onclick="resetForm()">ทำรายการใหม่</button>
+                    <button class="btn btn-ghost" style="margin:0 auto; flex:none; padding:14px 32px;" onclick="resetForm()">💧 ทำรายการใหม่</button>
                 </div>
             </div>
         </div>
@@ -338,7 +405,7 @@
     <!-- ================= [ 2. ADMIN LOGIN ] ================= -->
     <div id="admin-login-view">
         <div class="app-header">
-            <div class="logo-box" style="margin-bottom:20px;"><span>9</span></div>
+            <div class="logo-box" style="margin-bottom:20px;"><span>💧</span></div>
             <h1>ADMIN PORTAL</h1>
         </div>
         <div class="card" style="padding: 40px 30px;">
@@ -409,7 +476,7 @@
                     </div>
                 </div>
                 
-                <div style="background:linear-gradient(135deg, rgba(201, 168, 76, 0.1), rgba(201, 168, 76, 0.02)); border:1px solid rgba(201, 168, 76, 0.3); padding:16px 20px; border-radius:12px; font-size:13px; margin-bottom:20px; line-height:1.6; color:var(--cream-muted);" id="aiInsightBox"></div>
+                <div style="background:linear-gradient(135deg, rgba(11, 132, 198, 0.1), rgba(11, 132, 198, 0.02)); border:1px solid rgba(11, 132, 198, 0.3); padding:16px 20px; border-radius:12px; font-size:13px; margin-bottom:20px; line-height:1.6; color:var(--cream-muted);" id="aiInsightBox"></div>
                 
                 <table class="report-table">
                     <thead><tr><th>รายการ</th><th style="text-align:center">เดิม</th><th style="text-align:center">เบิกไป</th><th style="text-align:center">คงเหลือ</th></tr></thead>
@@ -426,6 +493,7 @@
     // ⚠️ นำ URL Web App ของคุณมาใส่ตรงนี้
     const API_URL = "https://script.google.com/macros/s/AKfycbxHlw3dFpnuw221inL-9tffcQnzyknQXGdbWfLwnkm2NpywSVzIL0yaM6dmyUCz4Kj7/exec"; 
 
+    const DROP_IMG = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#E6F4FC"/><path d="M32 12S18 29 18 38a14 14 0 0 0 28 0C46 29 32 12 32 12z" fill="#22A6E8"/><path d="M25 39a7 7 0 0 0 6 7" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none"/></svg>');
     let globalItems = [], globalHistory = [], currentFilter = 'all', currentStep = 1;
 
     window.onload = () => { fetchItems(); };
@@ -475,7 +543,7 @@
         let dept = document.getElementById('department').value === 'อื่นๆ' ? document.getElementById('otherDepartment').value : document.getElementById('department').value;
         let purpose = document.getElementById('purpose').value;
         
-        document.getElementById('confirmPersonal').innerHTML = `<div style="font-size:11px; font-weight:700; color:var(--brand-gold); margin-bottom:12px; letter-spacing:1px;">ข้อมูลผู้เบิก & วัตถุประสงค์</div><div class="confirm-row"><span class="confirm-key">ชื่อ-นามสกุล</span><span class="confirm-val">${document.getElementById('fullName').value}</span></div><div class="confirm-row"><span class="confirm-key">แผนก</span><span class="confirm-val">${dept}</span></div><div class="confirm-row" style="flex-direction:column; border:none; padding-bottom:0;"><span class="confirm-key" style="margin-bottom:6px;">วัตถุประสงค์:</span><span class="confirm-val" style="text-align:left; background:var(--onyx); padding:10px; border-radius:6px; font-weight:400; color:var(--cream-muted); font-size:13px;">${purpose}</span></div>`;
+        document.getElementById('confirmPersonal').innerHTML = `<div style="font-size:11px; font-weight:700; color:var(--brand-gold); margin-bottom:12px; letter-spacing:1px;">ข้อมูลผู้เบิก & วัตถุประสงค์</div><div class="confirm-row"><span class="confirm-key">ชื่อ-นามสกุล</span><span class="confirm-val">${document.getElementById('fullName').value}</span></div><div class="confirm-row"><span class="confirm-key">แผนก</span><span class="confirm-val">${dept}</span></div><div class="confirm-row" style="flex-direction:column; border:none; padding-bottom:0;"><span class="confirm-key" style="margin-bottom:6px;">วัตถุประสงค์:</span><span class="confirm-val" style="text-align:left; background:var(--onyx-mid); border:1px solid var(--onyx-border); padding:10px 12px; border-radius:6px; font-weight:400; color:var(--cream-muted); font-size:13px;">${purpose}</span></div>`;
         
         let rows = '';
         document.querySelectorAll('.app-input').forEach(inp => {
@@ -503,7 +571,7 @@
 
         grid.innerHTML = items.map(item => {
             const oos = item.stock <= 0;
-            const img = item.image || `https://via.placeholder.com/150/0D0D0D/C9A84C?text=${encodeURIComponent(item.name.substring(0,3))}`;
+            const img = item.image || DROP_IMG;
             return `
             <div class="product-card ${oos ? 'out-of-stock' : ''}" id="pc-${item.id}" style="${oos?'opacity:0.5':''}">
                 <img class="product-img" src="${img}">
@@ -657,7 +725,7 @@
     function renderAdminStock(items) {
         document.getElementById('adminStockContainer').innerHTML = items.map(i => {
             let json = JSON.stringify(i).replace(/'/g, "&#39;");
-            return `<div class="admin-list-item"><div><div style="font-size:11px;color:var(--text-muted);font-weight:600; letter-spacing:1px;">${i.id}</div><div style="font-weight:600; font-size:15px; color:var(--cream);">${i.name}</div></div><div style="display:flex;align-items:center;gap:14px;"><div style="font-weight:700;color:var(--success);font-size:16px;">${i.stock} <span style="font-size:12px;font-weight:500;">${i.unit}</span></div><button onclick='editItem(${json})' style="border:1px solid var(--onyx-border);background:var(--onyx);color:var(--cream-muted);padding:8px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-family:'Prompt';font-weight:600;">แก้ไข</button><button onclick="deleteItem('${i.id}')" style="border:1px solid rgba(192, 80, 80, 0.3);background:rgba(192, 80, 80, 0.1);color:var(--danger);padding:8px;border-radius:8px;cursor:pointer;">🗑</button></div></div>`;
+            return `<div class="admin-list-item"><div><div style="font-size:11px;color:var(--text-muted);font-weight:600; letter-spacing:1px;">${i.id}</div><div style="font-weight:600; font-size:15px; color:var(--cream);">${i.name}</div></div><div style="display:flex;align-items:center;gap:14px;"><div style="font-weight:700;color:var(--success);font-size:16px;">${i.stock} <span style="font-size:12px;font-weight:500;">${i.unit}</span></div><button onclick='editItem(${json})' style="border:1px solid var(--onyx-border);background:var(--onyx);color:var(--cream-muted);padding:8px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-family:'Sarabun';font-weight:600;">แก้ไข</button><button onclick="deleteItem('${i.id}')" style="border:1px solid rgba(192, 80, 80, 0.3);background:rgba(192, 80, 80, 0.1);color:var(--danger);padding:8px;border-radius:8px;cursor:pointer;">🗑</button></div></div>`;
         }).join('');
     }
 
@@ -670,7 +738,7 @@
     function deleteItem(id) { if(confirm('ลบรายการน้ำดื่มนี้ออกจากระบบ?')) fetch(API_URL,{method:"POST",body:JSON.stringify({action:"delete_item",itemId:id})}).then(r=>r.json()).then(d=>{fetchItems();}); }
 
     function renderAdminHistory(recs) {
-        document.getElementById('adminHistoryContainer').innerHTML = recs.map(r => `<div class="history-item"><div class="history-item-header"><div><strong style="color:var(--brand-gold); font-size:14px; letter-spacing:1px;">${r.orderId}</strong> <div style="font-size:12px;color:var(--cream-muted); margin-top:4px;">📅 ${new Date(r.timestamp).toLocaleDateString('th-TH')} | 👤 ${r.name}</div></div><button onclick="cancelOrder('${r.orderId}',${r.rowIdx})" style="border:1px solid var(--danger);background:transparent;color:var(--danger);border-radius:6px;font-size:11px;padding:6px 12px;cursor:pointer;font-family:'Prompt';font-weight:600;">ยกเลิกบิล</button></div><div style="font-size:12px; color:var(--cream-muted); margin-bottom:8px;"><strong>วัตถุประสงค์:</strong> ${r.purpose}</div><div class="history-summary" style="color:var(--cream);">${r.summary}</div></div>`).join('');
+        document.getElementById('adminHistoryContainer').innerHTML = recs.map(r => `<div class="history-item"><div class="history-item-header"><div><strong style="color:var(--brand-gold); font-size:14px; letter-spacing:1px;">${r.orderId}</strong> <div style="font-size:12px;color:var(--cream-muted); margin-top:4px;">📅 ${new Date(r.timestamp).toLocaleDateString('th-TH')} | 👤 ${r.name}</div></div><button onclick="cancelOrder('${r.orderId}',${r.rowIdx})" style="border:1px solid var(--danger);background:transparent;color:var(--danger);border-radius:6px;font-size:11px;padding:6px 12px;cursor:pointer;font-family:'Sarabun';font-weight:600;">ยกเลิกบิล</button></div><div style="font-size:12px; color:var(--cream-muted); margin-bottom:8px;"><strong>วัตถุประสงค์:</strong> ${r.purpose}</div><div class="history-summary" style="color:var(--cream);">${r.summary}</div></div>`).join('');
     }
     function cancelOrder(id, idx) { if(confirm('ต้องการยกเลิกบิลเบิกน้ำดื่มนี้และคืนยอดเข้าสต๊อกใช่หรือไม่?')) fetch(API_URL,{method:"POST",body:JSON.stringify({action:"cancel_order",orderId:id,rowIdx:idx})}).then(r=>r.json()).then(d=>{showToast('✅ ยกเลิกและคืนสต๊อกเรียบร้อย');fetchItems();}); }
 
